@@ -73,9 +73,17 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: hexo-theme-autumn
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: rsync
+  host: 144.34.242.33
+  user: root
+  root: /root/nginx/blog/
+  port: 29121
+  delete: true
+  verbose: true
+  ignore_errors: false
+
