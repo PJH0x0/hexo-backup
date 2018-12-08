@@ -10,6 +10,4 @@ hexo g
 hexo s
 ```
 # 插件说明
-```
-hexo-asset-image #图片使用插件
-```
+详见package.json

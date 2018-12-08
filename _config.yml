@@ -15,7 +15,7 @@ timezone: Asia/Shanghai
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: http://yoursite.com
 root: /
-permalink: :year/:month/:day/:title/
+permalink: posts/:abbrlink/
 permalink_defaults:
 
 # Directory
@@ -28,11 +28,7 @@ code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
 
-search:
-  path: search.xml
-  field: post
-  format: html
-  limit: 10000
+
 
 # Writing
 new_post_name: :title.md # File name of new posts
@@ -92,4 +88,24 @@ deploy:
   delete: true
   verbose: true
   ignore_errors: false
+
+# Plugins
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+
+marked:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
+
+abbrlink:
+  alg: crc32  #support crc16(default) and crc32
+  rep: hex    #support dec(default) and hex
 

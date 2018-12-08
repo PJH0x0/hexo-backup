@@ -1,10 +1,11 @@
 ---
 title: VPS搭建个人博客
 tags:
-- hexo
-- 个人博客
-- vps
+  - hexo
+  - 个人博客
+  - vps
 categories: hexo
+abbrlink: 83476d9a
 ---
 > 前言: 废了老大的劲,终于是将个人博客搭好了.分享一下经验以供大家参考.阅读本文需要的条件: 有使用过Mac或者Linux的经验,会vi的基本操作
 
