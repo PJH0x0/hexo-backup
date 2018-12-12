@@ -19,18 +19,18 @@ abbrlink: 83476d9a
 ## 生成ssh秘钥
 先到~/.ssh/目录下有没有*id_rsa,id_rsa.pub*两个文件,
 如果没有的话输入以下命令,然后一路回车即可
-``` Shell
+```Shell
 ssh-keygen -t rsa
 ```
 
 ## 通过ssh连接vps
 1. 使用以下命令拷贝id到本地, 默认端口号:22
-``` Shell 
+```Shell 
 ssh-copy-id -p 端口号 root@ip_address
 ```
 2. 输入VPS的root密码,**注意:不是VPS的密码**
 3. 连接vps
-``` Shell
+```Shell
 ssh -p 端口号 root@ip_address
 ```
 # 安装Hexo
@@ -44,11 +44,11 @@ ssh -p 端口号 root@ip_address
 ## 安装nginx
 nginx是个静态的服务器应用,不安装nginx vps服务器无法被其他人访问,首先要通过ssh连接vps.我的vps系统是centos6的,无法直接安装nginx,需要对源进行处理,其他系统请自行上网搜索安装
 ```Shell
-# 对源进行处理
+#对源进行处理
 rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
-# 安装nginx
+#安装nginx
 yum install nginx -y
-# 启动nginx服务(centos7 使用systemctl start nginx.service启动)
+#启动nginx服务(centos7 使用systemctl start nginx.service启动)
 service nginx start
 ```
 然后在本地系统打开浏览器, 然后输入vps服务器的ip地址,如果出现了**Welcome to
@@ -74,7 +74,7 @@ server {
 最简单的解决方案就是修改nginx的权限:`vi /etc/nginx/nginx.conf`然后将其中的user从nginx改为root, 
 ![hexo-root](nginx-config.png)
 当然还有一种更好的方式,修改目录的权限
-```
+```Shell
 #这个命令我没有试过,使用时请自行斟酌
 #第一个nginx是用户, 第二个nginx是我们创建的目录
 chown -R -v nginx:root nginx
@@ -92,13 +92,13 @@ yum -y install rsync
 
 ## 安装rsync
 ```Shell
-# 进入Hexo目录,然后执行
+#进入Hexo目录,然后执行
 npm install hexo-deployer-rsync --save
 ```
 ## 配置_config.yml
 主要配置以下几项:
 ```Shell
-# 记得冒号后面一定要加空格
+#记得冒号后面一定要加空格
 title: 
 subtitle:
 description: 
@@ -108,7 +108,7 @@ language: zh
 timezone: Asia/Shanghai
 theme: next
 
-# 下面的配置比较重要
+#下面的配置比较重要
 deploy:
   type: rsync
   host: #ip_address
@@ -124,7 +124,7 @@ deploy:
 ## 不使用rsync部署
 其实rsync就是把Hexo下面的public目录的文件已到vps的网页下面的目录中去了而已.那我们手动移动也是可以的
 ```Shell
-# 进入hexo目录, 这里使用我创建的目录作为例子
+#进入hexo目录, 这里使用我创建的目录作为例子
 scp -r public root@ip_address:/root/nginx/blog/ 
 ```
 

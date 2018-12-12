@@ -1,11 +1,12 @@
 ---
 title: WifiService启动流程
-tags: 
+tags:
   - android
   - wifi
 categories:
   - android
   - wifi
+abbrlink: d1635d94
 ---
 > 前言:一篇关于WifiService启动的文章,本人也是刚刚接触wifi,把阅读源码的心得记录下来,供大家一起学习与交流.阅读本文需要的条件: 对于源码有一定的认知, 了解Java语言
 

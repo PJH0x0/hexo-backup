@@ -5,6 +5,7 @@ tags:
   - issues
   - google
 categories: android
+abbrlink: c2df7e36
 ---
 > 前言:
 > 本文适合Android系统开发工程师参考,或是供使用Android原生系统的人看个热闹.主要注明以下几点:Android系统版本,应用版本号,复现步骤.如果应用版本更新之后最好重新复现,也许Google改掉了呢..
