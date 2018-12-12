@@ -1,0 +1,18 @@
+@startuml
+participant SystemServer as c1
+c1->c1 : run()
+c1->c1 : startOtherServices()
+participant SystemServiceManager as c2
+c1->c2 : startService(WIFI_SERVICE_CLASS)
+participant WifiService as c3
+c2->c3 : newInstance()
+participant WifiServiceImpl as c4
+c3->c4 : new WifiServiceImpl()
+c4->c3 : Return WifiServiceImpl instance
+c3->c2 : Return WifiService instance
+c2->c3 : onStart()
+participant SystemService as c5
+c3->c5 : publishBinderService(Context.WIFI_SERVICE, WifiServiceImpl)
+participant ServiceManager as c6
+c5->c6 : ServiceManager.addService(name, service, allowIsolated)
+@enduml
