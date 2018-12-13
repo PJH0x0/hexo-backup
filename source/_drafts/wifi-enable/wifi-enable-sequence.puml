@@ -1,0 +1,6 @@
+@startuml
+actor User
+participant WifiEnabler as c1
+User->c1 : Click enabler button
+c1->c1 : onSwitchChanged
+@enduml

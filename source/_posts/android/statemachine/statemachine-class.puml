@@ -1,0 +1,44 @@
+@startuml
+interface IState {
+    ~ {static} final boolean HANDLED
+    ~ {static} final boolean UNHANDLED
+    {abstract} void enter()
+    {abstract} void exit()
+    {abstract} boolean processMessage(Message msg)
+    {abstract} String getName()
+}
+IState <|.. State
+Handler <|-- SmHandler
+class SmHandler {
+    {field} fields
+    final void handleMessage(Message msg)
+    void performTransitions(State msgProcessedState, Message msg)
+    final void cleanupAfterQuitting()
+    final void completeConstruction()
+    final State processMsg(Message msg)
+    final void invokeExitMethods(StateInfo commonStateInfo)
+    final void invokeEnterMethods(int stateStackEnteringIndex)
+    final void moveDeferredMessageAtFrontOfQueue()
+    final int moveTempStateStackToStateStack()
+    final StateInfo setupTempStateStackWithStatesToEnter(State destState)
+    final void setupInitialStateStack()
+    final StateInfo addState(State state, State parent)
+    final void setInitialState(State initialState)
+    final void transitionTo(IState destState)
+    final void deferMessage(Message msg)
+}
+SmHandler +-- StateMachine : InnerClass
+class StateInfo {
+    State state
+    StateInfo parentStateInfo
+    boolean active
+    String toString()
+}
+StateInfo +-- SmHandler : InnerClass
+State <|-- HaltingState
+HaltingState +-- SmHandler
+State <|-- QuittingState
+QuittingState +-- SmHandler
+
+
+@enduml

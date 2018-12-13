@@ -1,5 +1,6 @@
 ---
 title: Google应用Bug集合
+date: 2018/12/11
 tags:
   - android
   - issues

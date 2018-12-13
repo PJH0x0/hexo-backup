@@ -1,5 +1,6 @@
 ---
 title: VPS搭建个人博客
+date: 2018/12/10
 tags:
   - hexo
   - 个人博客

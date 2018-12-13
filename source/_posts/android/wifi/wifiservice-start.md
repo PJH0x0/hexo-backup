@@ -1,5 +1,6 @@
 ---
 title: WifiService启动流程
+date: 2018/12/12
 tags:
   - android
   - wifi
@@ -126,6 +127,7 @@ protected final void publishBinderService(String name, IBinder service,
 }
 ```
 这块主要功能就是向ServiceManager中注册服务的,然后提供给客户端app,客户端app则通过Context创建WifiManager与WifiServiceImpl通信.
+以上就是WifiService的所有流程, 有问题或不足之处可以向我发送Email: godteen.peng@gmail.com
 还有一个就是自动开启Wifi的功能,用户如果关机前打开了WiFi,那么开机后也应该打开WiFi.
 ```Java
 @Override
