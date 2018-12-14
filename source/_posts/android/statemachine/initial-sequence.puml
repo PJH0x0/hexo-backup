@@ -1,0 +1,33 @@
+@startuml
+== Create StateMachine==
+actor Caller
+participant HelloState as c1
+Caller->c1 : HelloState(name)
+participant StateMachine as c2
+c1->c2 : super(name)
+c2->c2 : initStateMachine(name, looper)
+== Add state to StateMachine ==
+c1->c2 : addState(currentState, parentState)
+participant SmHandler as c3
+c2->c3 : addState(currentState, parentState)
+== Set intialState to receive first message ==
+c1->c2 : setInitialState(initialState)
+c2->c3 : setInitialState(initialState)
+== Start StateMachine ==
+Caller->c2 : start()
+c2->c3 : completeConstruction()
+activate c3
+c3->c3 : setupInitialStateStack() : create a temp stack
+activate c3
+c3->c3 : moveTempStateStackToStateStack() : reverse stack
+activate c3
+deactivate c3
+deactivate c3
+participant Handler as c4
+c3->c4 : sendMessageAtFrontOfQueue(Message:message)
+c4-->c3 : handleMessage(message:Message)
+c3->c3 : invokeEnterMethods(stateStackEnteringIndex:int)
+activate c3
+deactivate c3
+deactivate c3
+@enduml

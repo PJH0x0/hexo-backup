@@ -1,9 +1,9 @@
 @startuml
 start
-:StateMachine constructor
-:Create a new thread for SmHandler
-:Create SmHandler instance
-:Add some states
-:Set initial state
+:StateMachine constructor;
+:Create a new thread for SmHandler;
+:Create SmHandler instance;
+:Add some states;
+:Set initial state;
 end
 @enduml

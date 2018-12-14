@@ -28,6 +28,7 @@ class SmHandler {
     final void deferMessage(Message msg)
 }
 SmHandler +-- StateMachine : InnerClass
+StateMachine <|-- HelloState
 class StateInfo {
     State state
     StateInfo parentStateInfo
