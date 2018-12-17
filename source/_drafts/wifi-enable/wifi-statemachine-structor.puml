@@ -1,0 +1,34 @@
+@startuml
+rectangle mDefaultState
+rectangle mInitialState
+rectangle mSupplicantStartingState
+rectangle mSupplicantStartedState
+rectangle mScanModeState
+rectangle mConnectModeState
+rectangle mL2ConnectedState
+rectangle mObtainingIpState
+rectangle mConnectedState
+rectangle mRoamingState
+rectangle mDisconnectingState
+rectangle mDisconnectedState
+rectangle mWpsRunningState
+rectangle mWaitForP2pDisableState
+rectangle mSupplicantStoppingState
+rectangle mSoftApState
+
+mInitialState-up-mDefaultState
+mSupplicantStartingState-up-mDefaultState
+mSupplicantStartedState-up-mDefaultState
+mScanModeState-up-mSupplicantStartedState
+mConnectModeState-up-mSupplicantStartedState
+mL2ConnectedState-up-mConnectModeState
+mObtainingIpState-up-mL2ConnectedState
+mConnectedState-up-mL2ConnectedState
+mRoamingState-up-mL2ConnectedState
+mDisconnectingState-up-mConnectModeState
+mDisconnectedState-up-mConnectModeState
+mWpsRunningState-up-mConnectModeState
+mWaitForP2pDisableState-up-mSupplicantStartedState
+mSupplicantStoppingState-up-mDefaultState
+mSoftApState-up-mDefaultState
+@enduml

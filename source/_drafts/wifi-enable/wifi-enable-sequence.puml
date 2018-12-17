@@ -1,6 +1,51 @@
 @startuml
 actor User
 participant WifiEnabler as c1
+== Client Process==
 User->c1 : Click enabler button
 c1->c1 : onSwitchChanged
+participant WifiManager as c2
+c1->c2 : setWifiEnabled(enabled)
+== Service Process ==
+participant WifiServiceImpl as c3
+c2->c3 : setWifiEnabled(enabled) : BinderCall
+participant WifiController as c4
+c3->c4 : sendMessage(CMD_WIFI_TOGGLED)
+participant WifiController.ApStaDisabledState as c5
+c4->c5 : processMessage(CMD_WIFI_TOGGLED)
+participant WifiStateMachine as c6
+c5->c6 : setOperationalMode(WifiStateMachine.CONNECT_MODE)
+c5->c4 : transitionTo(DeviceActiveState)
+participant WifiController.StaEnabledState as c7
+c7->c6 : setSupplicantRunning(true)
+participant WifiController.DeviceActiveState as c8
+c8->c6 : setOperationalMode(WifiStateMachine.CONNECT_MODE)
+c7->c6 : setHighPerfModeEnabled(false)
+c6-->c6 : sendMessage(CMD_SET_OPERATIONAL_MODE, mode, 0)
+participant WifiStateMachine.InitialState as c9
+c6->c9 : processMessage(CMD_SET_OPERATIONAL_MODE)
+c9->c6 : sendMessage(CMD_START_SUPPLICANT) : only add to MessageQueue
+c6->c9 : processMessage(CMD_START_SUPPLICANT) : from WifiController$StaEnabledState
+participant WifiNative as c10
+c9->c10 : setupForClientMode()
+c9->c10 : enableSupplicant()
+participant WifiStateMachine.SupplicantStartingState as c11
+c10->c6:transitionTo(SupplicantStartingState)
+c11->c6:deferMessage(CMD_SET_OPERATIONAL_MODE)
+participant WifiStateMachine.DefaultState as c12
+c11->c12:processMessage(CMD_SET_HIGH_PERF_MODE)
+c11->c6:deferMessage(CMD_START_SUPPLICANT)
+c6->c12: processMessage(CMD_GET_SUPPORTED_FEATURES)
+c6->c11: processMessage(SUP_CONNECTION_EVENT)
+c11->c6: transitionTo(SupplicantStartedState)
+participant WifiStateMachine.SupplicantStartedState as c13
+c6->c13: enter()
+c13->c6: transitionTo(DisconnectedState)
+participant WifiStateMachine.ConnectModeState as c14
+c6->c14: enter()
+participant WifiStateMachine.Disconnectedstate as c15
+c6->c15: enter()
+c6->c15: processMessage(CMD_SET_OPERATIONAL_MODE)
+c6->c12: processMessage(CMD_START_SUPPLICANT)
+
 @enduml

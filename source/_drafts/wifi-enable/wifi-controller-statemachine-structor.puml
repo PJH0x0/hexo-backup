@@ -1,0 +1,26 @@
+@startuml
+rectangle mDefaultState
+rectangle mApStaDisabledState
+rectangle mStaEnabledState
+rectangle mDeviceActiveState
+rectangle mDeviceInactiveState
+rectangle mScanOnlyLockHeldState
+rectangle mFullLockHeldState
+rectangle mFullHighPerfLockHeldState
+rectangle mNoLockHeldState
+rectangle mStaDisabledWithScanState
+rectangle mApEnabledState
+rectangle mEcmState
+
+mApStaDisabledState-up-mDefaultState
+mStaEnabledState-up-mDefaultState
+mDeviceActiveState-up-mStaEnabledState
+mDeviceInactiveState-up-mStaEnabledState
+mScanOnlyLockHeldState-up-mDeviceInactiveState
+mFullLockHeldState-up-mDeviceInactiveState
+mFullHighPerfLockHeldState-up-mDeviceInactiveState
+mNoLockHeldState-up-mDeviceInactiveState
+mStaDisabledWithScanState-up-mDefaultState
+mApEnabledState-up-mDefaultState
+mEcmState-up-mDefaultState
+@enduml

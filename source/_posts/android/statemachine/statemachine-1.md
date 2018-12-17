@@ -266,3 +266,4 @@ private final void invokeEnterMethods(int stateStackEnteringIndex) {
 综上所述，启动状态机有两个步骤。
 1. 构建栈结构
 2. 从root节点到Init节点依次调用节点State的enter()方法
+下篇[Android状态机模式解析(二)](http://www.godteen.com/posts/735aa624/)

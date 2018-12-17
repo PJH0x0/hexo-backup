@@ -176,8 +176,8 @@ private void performTransitions(State msgProcessedState, Message msg) {
 
             //deferMessage机制，后续再讨论
             moveDeferredMessageAtFrontOfQueue();
-            //判断有没有其他线程修改mDestState，这里我们只讨论单线程的调用
-            //这个条件不用管
+            //如果在State的enter()或是exit()方法调用了transitionTo()
+            //要继续切换到目标状态
             if (destState != mDestState) {
                 // A new mDestState so continue looping
                 destState = mDestState;
@@ -333,8 +333,8 @@ private void performTransitions(State msgProcessedState, Message msg) {
 
             //1. 此时已经切换到destState了，以上面的例子，destState已经变为mS2
             moveDeferredMessageAtFrontOfQueue();
-            //判断有没有其他线程修改mDestState，这里我们只讨论单线程的调用
-            //这个条件不用管
+            //如果在State的enter()或是exit()方法调用了transitionTo()
+            //要继续切换到目标状态
             if (destState != mDestState) {
                 // A new mDestState so continue looping
                 destState = mDestState;
