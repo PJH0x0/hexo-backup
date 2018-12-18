@@ -1,0 +1,25 @@
+@startuml
+actor User
+participant WifiEnabler as c1
+== Client Process==
+User->c1 : Click enabler button
+c1->c1 : onSwitchChanged
+participant WifiManager as c2
+c1->c2 : setWifiEnabled(enabled)
+== Service Process ==
+participant WifiServiceImpl as c3
+c2->c3 : setWifiEnabled(enabled) : BinderCall
+participant WifiController as c4
+c3->c4 : sendMessage(CMD_WIFI_TOGGLED)
+participant WifiController.ApStaDisabledState as c5
+c4->c5 : processMessage(CMD_WIFI_TOGGLED)
+participant WifiStateMachine as c9
+c5->c9 : setOperationalMode(WifiStateMachine.CONNECT_MODE)
+c5->c4 : transitionTo(DeviceActiveState)
+participant WifiController.StaEnabledState as c7
+c7->c9 : setSupplicantRunning(true)
+participant WifiController.DeviceActiveState as c8
+c8->c9 : setOperationalMode(WifiStateMachine.CONNECT_MODE)
+c7->c9 : setHighPerfModeEnabled(false)
+c9-->c9 : sendMessage(CMD_SET_OPERATIONAL_MODE, mode, 0)
+@enduml
