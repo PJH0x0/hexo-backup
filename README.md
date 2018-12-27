@@ -11,3 +11,4 @@ hexo s
 ```
 # 插件说明
 详见package.json
+aaaa
