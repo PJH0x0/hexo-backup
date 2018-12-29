@@ -6,6 +6,7 @@ categories:
 tags:
   - android pie
   - build
+abbrlink: 73919dd2
 ---
 > 前言: 本文是针对国内无法科学上网或者即使可以网速也很慢的情况下针对Google 2018年发布的Android P编译的一篇文章.如果能够科学上网的同学尽量参照[官方教程](https://source.android.com/setup/build/downloading),里面也是有中文页面的.阅读本文需要的知识:Shell命令有一定了解, Git基本操作, 对Android有一定的了解
 
@@ -35,6 +36,7 @@ sudo apt-get install libgl1-mesa-dev libxml2-utils xsltproc unzip m4
 sudo apt-get install libswitch-perl
 sudo apt-get install git-core gawk
 ```
+上面的命令依次执行,可能会有不支持i386和32位的情况跳过即可, 如果已安装最新的版本也不用去管.
 # 源码下载
 ## 安装repo
 repo是一个git工具,专门给android使用的.
@@ -66,18 +68,19 @@ repo sync
 source build/envsetup.sh
 lunch
 ```
-执行完`lunch`命令后会有很多个项目供选择,选择其中一个即可,输入对应项目前面的编号或者是项目名称按回车.一般有三种选择:
-1. aosp_arm-eng, 编译arm架构的32位的engineer版本
-2. aosp_arm64-eng, 编译arm架构下64位的engineer版本
-3. aosp_x86_64-eng, 编译x86架构下64位的engineer版本,据说这种方式编译出来的emulator很快,但没有这种感觉啊,开机还是很慢
-选定项目后执行`make -j4`, `-j4`取决于你的机器,取的大一点也无所谓. 如果出现了`make compelete successfully`就表明编译成功了.
+执行完`lunch`命令后会有很多个版本供选择,选择其中一个即可,输入对应版本前面的编号或者是版本名称按回车.一般有三种选择:
+1. aosp_arm-eng, 编译arm架构的32位的engineer版本.
+2. aosp_arm64-eng, 编译arm架构下64位的engineer版本.
+3. aosp_x86_64-eng, 编译x86架构下64位的engineer版本,据说这种方式编译出来的emulator很快,但我连开机都做不到.
+
+选定版本后执行`make -j4`, `-j4`取决于你的机器,取的大一点也无所谓. 如果编译结束后出现了`make compelete successfully`就表明编译成功了.  
 # 启动虚拟机
 使用`emulator`启动android虚拟机, `emulator -help`可以查看对应的参数.这里要注意两个问题:
 1. 使用`emulator`一定要先执行`source和lunch`命令.
-2. 使用`-kernel`参数的时候一定要注意自己编译时`lunch`的版本, 而且要指定好目录,例如:`lunch` aosp_arm64_eng版本的话
+2. 如果使用aosp_x86_64-eng要启动虚拟机要开启硬件加速,具体如何启动需要自行搜索一下.
 
 # 总结
-如果大家编译报错,多上StackOverflow进行找找问题解决方案, 祝大家编译顺利!!!
+如果大家编译报错,多上StackOverflow进行找找问题解决方案, 实在找不到解决方案就重新下一份其他分支上面的代码重新编(反正我是这么干的),祝大家编译顺利!!!
 
 参考:
 1. https://www.jianshu.com/p/716088b50332
