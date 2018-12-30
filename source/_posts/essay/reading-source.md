@@ -4,6 +4,7 @@ categories: essay
 tags:
   - reading
   - source code
+abbrlink: f75132f4
 ---
 >前言：本文只是我个人平时阅读源码时的一些思考，如果和读者思考相左，请忽视即可，若因此而困扰，我也只能十分抱歉。阅读本文所需知识：计算机基础知识
 
