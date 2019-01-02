@@ -71,7 +71,7 @@ lunch
 执行完`lunch`命令后会有很多个版本供选择,选择其中一个即可,输入对应版本前面的编号或者是版本名称按回车.一般有三种选择:
 1. aosp_arm-eng, 编译arm架构的32位的engineer版本.
 2. aosp_arm64-eng, 编译arm架构下64位的engineer版本.
-3. aosp_x86_64-eng, 编译x86架构下64位的engineer版本,据说这种方式编译出来的emulator很快,但我连开机都做不到.
+3. aosp_x86_64-eng, 编译x86架构下64位的engineer版本(推荐编译这个版本, 速度真的快很多, 不过要机器支持虚拟化,而且如果没有显卡的话还得加上-gpu off参数)
 
 选定版本后执行`make -j4`, `-j4`取决于你的机器,取的大一点也无所谓. 如果编译结束后出现了`make compelete successfully`就表明编译成功了.  
 # 启动虚拟机
