@@ -1,0 +1,9 @@
+@startuml
+class ScanData{
+    int mId
+    int mFlags
+    int mBucketsScanned
+    boolean mAllChannelsScanned
+    ScanResult mResults[]
+}
+@enduml

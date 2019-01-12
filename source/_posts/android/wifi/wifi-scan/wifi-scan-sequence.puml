@@ -1,4 +1,5 @@
 @startuml
+== Start scan ==
 participant WifiStateMachine as c1
 participant WifiTracker as c2
 c1->c2 : sendBroadcast(WifiManager.WIFI_STATE_CHANGED_ACTION)
@@ -32,11 +33,18 @@ participant WificondControl as c14
 c13->c14 : scan()
 participant wpa_supplicant as c15
 c14->c15 : scan()
-== Callback start==
-participant WificonControl.ScanEventHandler as c16
-c15->c14 : OnScanResultReady()
+== Start scan ==
+
+== Register scan callback ==
+c14->c15 : subscribeScanEvents(WificondControl.ScanEventHandler)
 participant WifiMonitor as c17
-c14->c17 : broadcastScanResultEvent()
+c12->c17 : registerHandler(WifiMonitor.SCAN_RESULTS_EVENT)
+== Register scan callback ==
+
+== Scan callback ==
+participant WificondControl.ScanEventHandler as c16
+c15->c16 : OnScanResultReady()
+c16->c17 : broadcastScanResultEvent()
 c17->c12 : sendMessage(SCAN_RESULTS_EVENT)
 c12->c12 : handleMessage(SCAN_RESULTS_EVENT)
 c12->c12 : pollLatestScanData()
@@ -48,8 +56,20 @@ c15->c14 : return NativeScanResult[]
 c14->c13 : return ArrayList<ScanDetail>
 c13->c12 : return ArrayList<ScanDetail>
 
-c12->c10 : onFullScanResult()
+c12->c10 : onScanStatus()
+c10->c10 : sendMessage(CMD_SCAN_RESULTS_AVAILABLE)
+participant WifiSingleScanStateMachine.ScanningState as c18
+c10->c18 : processMessage(CMD_SCAN_RESULTS_AVAILABLE)
+c18->c12 : getLatestSingleScanResults()
+c12->c18 : return WifiScanner.ScanData
+c18->c10 : reportScanResults()
+c10->c7 : sendMessage(CMD_SCAN_RESULT)
+participant ScanRequestProxy.ScanRequestProxyScanListener as c19
+c7->c19 : onResults()
+c19->c6 : sendScanResultBroadcastIfScanProcessingNotComplete(true)
+c6->c6 : sendScanResultBroadcast(true)
+c6->c2 : sendBroadcast(SCAN_RESULTS_AVAILABLE_ACTION)
 
-== Callback end ==
+== Scan callback ==
 
 @enduml
