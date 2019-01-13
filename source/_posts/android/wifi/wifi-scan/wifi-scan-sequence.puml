@@ -35,15 +35,10 @@ participant wpa_supplicant as c15
 c14->c15 : scan()
 == Start scan ==
 
-== Register scan callback ==
-c14->c15 : subscribeScanEvents(WificondControl.ScanEventHandler)
-participant WifiMonitor as c17
-c12->c17 : registerHandler(WifiMonitor.SCAN_RESULTS_EVENT)
-== Register scan callback ==
-
 == Scan callback ==
 participant WificondControl.ScanEventHandler as c16
 c15->c16 : OnScanResultReady()
+participant WifiMonitor as c17
 c16->c17 : broadcastScanResultEvent()
 c17->c12 : sendMessage(SCAN_RESULTS_EVENT)
 c12->c12 : handleMessage(SCAN_RESULTS_EVENT)

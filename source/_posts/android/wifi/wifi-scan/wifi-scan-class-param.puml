@@ -1,0 +1,74 @@
+@startuml
+class WifiScanner.ScanSettings.HiddenNetwork {
+    String ssid;
+}
+class WifiScanner.ChannelSpec {
+    int frequency
+    boolean passive
+    int dwellTimeMS
+}
+class WifiScanner.ScanSettings {
+    int band
+    ChannelSpec[] channels
+    HiddenNetwork[] hiddenNetworks
+    int periodInMs
+    int reportEvents
+    int numBssidsPerScan
+    int maxScansToCache
+    int maxPeriodInMs
+    int stepCount
+    boolean isPnoScan
+    int type
+}
+WifiScanner.ScanSettings "1" *-- "many" WifiScanner.ChannelSpec
+WifiScanner.ScanSettings "1" *-- "many" WifiScanner.ScanSettings.HiddenNetwork
+
+class WifiNative.ScanSettings {
+    int scanType
+    int base_period_ms
+    int max_ap_per_scan
+    int report_threshold_percent
+    int report_threshold_num_scans
+    int num_buckets
+    HiddenNetwork[] hiddenNetworks
+    BucketSettings[] buckets
+}
+
+class WifiNative.BucketSettings {
+    int bucket
+    int band
+    int period_ms
+    int max_period_ms
+    int step_count
+    int report_events
+    int num_channels
+    ChannelSettings[] channels
+}
+
+class WifiNative.HiddenNetwork {
+    String ssid
+}
+
+class WifiNative.ChannelSettings {
+    int frequency
+    int dwell_time_ms
+    boolean passive
+}
+
+WifiNative.ScanSettings "1" *-- "many" WifiNative.HiddenNetwork
+WifiNative.ScanSettings "1" *-- "many" WifiNative.BucketSettings
+WifiNative.BucketSettings "1" *-- "many" WifiNative.ChannelSettings
+
+class WificondScannerImpl.LastScanSettings {
+    long startTime
+    boolean reportSingleScanFullResults
+    ChannelCollection singleScanFreqs
+    WifiNative.ScanEventHandler singleScanEventHandler
+}
+
+class SingleScanSettings {
+    int scanType
+    ArrayList<ChannelSettings> channelSettings
+    ArrayList<HiddenNetwork> hiddenNetworks
+}
+@enduml

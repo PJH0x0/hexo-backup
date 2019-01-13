@@ -1,4 +1,121 @@
 @startuml
+class NativeScanResult {
+    byte[] ssid
+    byte[] bssid
+    byte[] infoElement
+    int frequency
+    int signalMbm
+    long tsf
+    BitSet capability
+    boolean associated
+    ArrayList<RadioChainInfo> radioChainInfos
+}
+
+class ScanDetail {
+    final ScanResult mScanResult
+    volatile NetworkDetail mNetworkDetail
+    long mSeen
+}
+
+class ScanResult {
+    String SSID
+    WifiSsid wifiSsid
+    String BSSID
+    long hessid
+    int anqpDomainId
+    String capabilities
+    int level
+    int frequency
+    int channelWidth
+    int centerFreq0
+    int centerFreq1
+    boolean is80211McRTTResponder
+    long timestamp
+    long seen
+    RadioChainInfo[] radioChainInfos
+    boolean untrusted
+    int numUsage
+    int distanceCm
+    int distanceSdCm
+    long flags
+    CharSequence venueName
+    CharSequence operatorFriendlyName
+    InformationElement[] informationElements
+    AnqpInformationElement[] anqpElements
+    boolean isCarrierAp
+    int carrierApEapType
+    String carrierName
+}
+
+class ScanResult.RadioChainInfo {
+    int id
+    int level
+}
+
+class ScanResult.InformationElement {
+    int id
+    byte[] bytes
+}
+
+ScanResult "1" *-- "many" ScanResult.RadioChainInfo
+ScanResult "1" *-- "many" ScanResult.InformationElement
+
+class NetworkDetail {
+    final String mSSID
+    final long mHESSID
+    final long mBSSID
+    final boolean mIsHiddenSsid
+    final int mStationCount
+    final int mChannelUtilization
+    final int mCapacity
+    final int mChannelWidth
+    final int mPrimaryFreq
+    final int mCenterfreq0
+    final int mCenterfreq1
+    final int mWifiMode
+    final int mMaxRate
+    final Ant mAnt
+    final boolean mInternet
+    final HSRelease mHSRelease
+    final int mAnqpDomainID
+    final int mAnqpOICount
+    final long[] mRoamingConsortiums
+    int mDtimInterval
+    final InformationElementUtil.ExtendedCapabilities mExtendedCapabilities;
+    final Map<Constants.ANQPElementType, ANQPElement> mANQPElements;
+}
+
+enum NetworkDetail.Ant {
+    Private,
+    PrivateWithGuest,
+    ChargeablePublic,
+    FreePublic,
+    Personal,
+    EmergencyOnly,
+    Resvd6,
+    Resvd7,
+    Resvd8,
+    Resvd9,
+    Resvd10,
+    Resvd11,
+    Resvd12,
+    Resvd13,
+    TestOrExperimental,
+    Wildcard
+}
+
+enum NetworkDetail.HSRelease {
+        R1,
+        R2,
+        Unknown
+}
+
+NetworkDetail *-- NetworkDetail.Ant 
+NetworkDetail *-- NetworkDetail.HSRelease
+
+ScanDetail o-- ScanResult
+ScanDetail o-- NetworkDetail
+
 class ScanData{
     int mId
     int mFlags
@@ -6,4 +123,6 @@ class ScanData{
     boolean mAllChannelsScanned
     ScanResult mResults[]
 }
+
+ScanData "1" o-- "many" ScanResult
 @enduml
