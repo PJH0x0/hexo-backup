@@ -1,0 +1,18 @@
+@startuml
+rectangle mDefaultState
+rectangle mConnectModeState
+rectangle mL2ConnectedState
+rectangle mObtainingIpState
+rectangle mConnectedState
+rectangle mRoamingState
+rectangle mDisconnectingState
+rectangle mDisconnectedState
+
+mConnectModeState-up-mDefaultState
+mL2ConnectedState-up-mConnectModeState
+mObtainingIpState-up-mL2ConnectedState
+mConnectedState-up-mL2ConnectedState
+mRoamingState-up-mL2ConnectedState
+mDisconnectingState-up-mConnectModeState
+mDisconnectedState-up-mConnectModeState
+@enduml

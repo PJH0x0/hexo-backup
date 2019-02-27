@@ -1,0 +1,47 @@
+@startuml
+participant WifiEnabler as c0
+participant WifiManager as c1
+c0->c1 : setWifiEnabled(true)
+participant WifiServiceImpl as c2
+c1->c2 : setWifiEnabled(true) : bind call
+participant WifiController as c3
+c2->c3 : sendMessage(CMD_WIFI_TOGGLED)
+participant StaDisabledState as c4
+c3->c4 : processMessage(CMD_WIFI_TOGGLED)
+c4->c3 : transitionTo(mDeviceActiveState)
+participant DeviceActiveState as c5
+c3->c5 : enter()
+participant WifiStateMachinePrime as c6
+c5->c6 : enterClientMode()
+c6->c6 : changeMode(CMD_START_CLIENT_MODE)
+participant ModeStateMachine as c7
+c6->c7 : sendMessage(CMD_START_CLIENT_MODE)
+participant WifiDisabledState as c8
+c7->c8 : processMessage(CMD_START_CLIENT_MODE)
+c8->c7 : checkForAndHandleModeChange(CMD_START_CLIENT_MODE)
+c7->c7 : transitionTo(mClientModeActiveState)
+participant ClientModeActiveState as c9
+c7->c9 : enter()
+participant ClientModeManager as c10
+c9->c10 : start()
+participant ClientModeStateMachine as c11
+c10->c11 : sendMessage(CMD_START)
+participant ClientModeStateMachine.IdleState as c12
+c11->c12 : processMessage(CMD_START)
+participant WifiNative as c13
+c12->c13 : setupInterfaceForClientMode()
+c12->c11 : transitionTo(mStartedState)
+participant StartedState as c14
+c11->c14 : enter()
+c14->c14 : onUpChanged()
+participant WifiStateMachine as c15
+c14->c15 : setOperationalMode()
+c15->c15 : transitionTo(mDisconnectedState)
+c15->c15 : sendMessageAtFrontOfQueue(CMD_SET_OPERATIONAL_MODE)
+participant DefaultState as c16
+c15->c16 : processMessage(CMD_SET_OPERATIONAL_MODE)
+participant ConnectModeState as c17
+c15->c17 : enter()
+participant DisconnectedState as c18
+c15->c18 : enter()
+@enduml

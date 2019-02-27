@@ -1,0 +1,35 @@
+@startuml
+
+==User get==
+participant DataUsagePreference as c1
+participant DataUsageController as c2
+c1->c2 : getDataUsageInfo()
+participant INetworkStatsSession.Stub as c3
+c2->c3 : getHistoryForNetwork() : binder call
+participant NetworkStatsService as c4
+c3->c4 : internalGetHistoryForNetwork()
+participant NetworkStatsCollection as c5
+c4->c5 : getHistory()
+loop mStats.size() times
+participant ArrayMap as c6
+c5->c6 : valueAt()
+participant NetworkStatsHistory as c7
+c6->c7 : recordHistory()
+end
+c5->c4 : return NetworkStatsHistory
+c4->c3 : return NetworkStatsHistory
+c3->c2 : return NetworkStatsHistory
+c2->c1 : return DataUsageInfo
+
+==Init Stats==
+participant SystemServer as c8
+c8->c4 : systemReady()
+participant NetworkStatsRecorder as c9
+c4->c9 : getOrLoadCompleteLocked()
+c9->c9 : readLock()
+participant FileRotator as c10
+c9->c10 : readMatching()
+c10->c10 : readFile()
+c10->c5 : read()
+c5->c5 : recordHistory()
+@enduml
