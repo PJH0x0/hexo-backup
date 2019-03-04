@@ -26,7 +26,7 @@ participant ClientModeManager as c10
 c9->c10 : start()
 participant ClientModeStateMachine as c11
 c10->c11 : sendMessage(CMD_START)
-participant ClientModeStateMachine.IdleState as c12
+participant IdleState as c12
 c11->c12 : processMessage(CMD_START)
 participant WifiNative as c13
 c12->c13 : setupInterfaceForClientMode()
@@ -34,6 +34,8 @@ c12->c11 : transitionTo(mStartedState)
 participant StartedState as c14
 c11->c14 : enter()
 c14->c14 : onUpChanged()
+c14->c10 : updateWifiState(WIFI_STATE_ENABLED)
+c10-> : senBroadcast(WIFI_STATE_CHANGED)
 participant WifiStateMachine as c15
 c14->c15 : setOperationalMode()
 c15->c15 : transitionTo(mDisconnectedState)

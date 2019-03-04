@@ -1,0 +1,44 @@
+@startuml
+participant WifiSettings as c1
+participant WifiManager as c2
+c1->c2 : connect()
+participant WifiServiceImpl.ClientHandler as c3
+c2->c3 : sendMessage(CONNECT_NETWORK)
+participant WifiStateMachine as c4
+c3->c4 : sendMessage(CONNECT_NETWORK)
+participant ConnectModeState as c5
+c4->c5 : processMessage(CONNECT_NETWORK)
+c5->c4 : connectToUserSelectNetwork()
+c4->c4 : startConnectToNetwork()
+c4->c4 : sendMessage(CMD_START_CONNECT)
+c4->c5 : processMessage(CMD_START_CONNECT)
+participant WifiNative as c6
+c5->c6 : connectToNetwork()
+participant SupplicantStaIfaceHal as c7
+c6->c7 : connectToNetwork()
+c7->c7 : addNetwork()
+participant wpa_supplicant as c8
+c7->c8 : addNetwork()
+participant SupplicantStaIfaceHalCallback as c9
+c8->c9 : onStateChange()
+participant WifiMonitor as c10
+c9->c10 : broadcastSupplicantStateChangeEvent()
+c10->c4 : sendMessage(SUPPLICANT_STATE_CHANGE_EVENT)
+participant DisconnectedState as c11
+c4->c11 : processMessage(SUPPLICANT_STATE_CHANGE_EVENT)
+c11->c4 : setNetworkDetailedState()
+c4->c4 : sendNetworkStateChangeBroadcast()
+c4-> : sendBroadcast(NETWORK_STATE_CHANGED_ACTION)
+c10->c4 : sendMessage(NETWORK_CONNECTION_EVENT)
+c4->c5 : processMessage(NETWORK_CONNECTION_EVENT)
+c5->c4 : transitionTo(ObtainingIpState)
+participant ObtainingIpState as c12
+c4->c12 : enter()
+c4->c12 : processMessage(CMD_PRE_DHCP_ACTION)
+c4->c12 : processMessage(CMD_PRE_DHCP_ACTION_COMPLETE)
+c4->c12 : processMessage(CMD_POST_DHCP_ACTION)
+c4->c12 : processMessage(CMD_IPV4_PROVISIONING_SUCCESS)
+c12->c4 : transitionTo(ConnectedState)
+participant ConnectedState as c13
+c3->c13 : enter()
+@enduml
