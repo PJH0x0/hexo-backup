@@ -1,4 +1,5 @@
-@startuml
+@startuml wifi-connect-sequence
+
 participant WifiSettings as c1
 participant WifiManager as c2
 c1->c2 : connect()
