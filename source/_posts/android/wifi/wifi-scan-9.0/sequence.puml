@@ -1,4 +1,4 @@
-@startuml
+@startuml wifi-scan
 == Start scan ==
 participant WifiStateMachine as c1
 participant WifiTracker as c2
@@ -31,8 +31,8 @@ participant WifiNative as c13
 c12->c13 : scan()
 participant WificondControl as c14
 c13->c14 : scan()
-participant wpa_supplicant as c15
-c14->c15 : scan()
+participant IWifiScannerImpl as c15
+c14->c15 : scan() : bindercall
 == Start scan ==
 
 == Scan callback ==
@@ -64,7 +64,11 @@ c7->c19 : onResults()
 c19->c6 : sendScanResultBroadcastIfScanProcessingNotComplete(true)
 c6->c6 : sendScanResultBroadcast(true)
 c6->c2 : sendBroadcast(SCAN_RESULTS_AVAILABLE_ACTION)
-
 == Scan callback ==
+
+== register callback ==
+c12->c17 : registerHandler()
+c14->c15 : subscribeScanEvents()
+== register callback ==
 
 @enduml

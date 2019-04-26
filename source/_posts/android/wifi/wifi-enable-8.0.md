@@ -25,7 +25,7 @@ frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.ja
 ```
 # 时序图
 这里没有给出完整的时序图,因为后面状态机切换流程比较复杂,不太好用时序图进行表示
-![wifi-enable](wifi-enable-sequence.png)
+![wifi-enable](sequence.png)
 
 # 用户进程处理
 用户进程是WifiEnabler和WifiManager的调用
