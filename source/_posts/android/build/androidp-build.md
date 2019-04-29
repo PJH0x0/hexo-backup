@@ -4,7 +4,7 @@ categories:
   - android
   - build
 tags:
-  - android pie
+  - android
   - build
 abbrlink: 73919dd2
 ---
