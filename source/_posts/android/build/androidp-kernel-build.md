@@ -1,5 +1,6 @@
 ---
 title: Android 9.0内核编译
+date: 2019/01/02
 categories:
   - android
   - build

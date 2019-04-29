@@ -7,6 +7,7 @@ tags:
 categories:
   - android
   - wifi
+abbrlink: 498423ea
 ---
 >前言:本文是针对与Android 9.0 wifi enable的流程解析,由于Android 8.0和Android 9.0的frameworks的差异比较大,所以重新写一遍流程
 # UML图

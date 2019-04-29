@@ -1,3 +1,12 @@
+---
+title: Android Studio导入Android 源码
+date: 2019/04/28
+tags:
+  - android
+  - tool
+categories: android
+abbrlink: fc5ae756
+---
 # 前言
 前提:
 1. Android版本: Android 7.0
@@ -21,10 +30,12 @@
 
 **Tips：**
 1. 以上所有的命令都要在同一个目录下执行
-2. 暂时先不要导入，
+2. 暂时先不要导入，<br/>
+
 # 遇到的一些问题
 1. 导入时间很长，原因是导入了一些不需要的目录
-2. 跳转文件不对，经常跳转到classes目录下，原因是没有移除.jar文件和out目录
+2. 跳转文件不对，经常跳转到classes目录下，原因是没有移除.jar文件和out目录<br/>
+
 # 解决方案
 1. 打开Android源码root目录下的android.iml,添加自己不需要的内容，之前应该有已经排除了的目录，这里在自己添加一些，这样一来导入的速度就加快很多了，但一般机械硬盘也要个十几分钟吧
 ``` xml
