@@ -81,7 +81,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: rsync
-  host: 144.34.242.33
+  host: 45.78.3.80
   user: root
   root: /root/nginx/blog/
   port: 29121
