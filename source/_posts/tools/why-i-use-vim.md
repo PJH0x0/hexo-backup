@@ -3,6 +3,7 @@ title: 我为什么要使用VIM
 date: 2019/07/24
 tags: tools
 categories: tools
+abbrlink: 77c23cfe
 ---
 # 前言 
 作为一名Android应用工程师, 个人算是用的比较多的编辑器了, 从IDE Eclipse, AndroidStudio到编辑器SublimeText, UltraEdit, gedit, vscode, atom这些我都用过, 虽然都是浅尝辄止, 但是从Android开发上来说, AndroidStudio无疑是最合适的, 丰富的插件和功能, 尤其是Live Template功能, 自定义起来不要太爽, 唯一的缺点就是内存消耗太大了, 没有16G内存+SSD感觉可以不用尝试了, 编辑器看起来都差不太多, UltraEdit我一般用来搜索LOG比较方便, SublimeText无疑是各方面非常优秀的编辑器, 但是要收费, vscode, atom这两个优点在于插件多, 但是消耗起内存一点都不比Android Studio差.
