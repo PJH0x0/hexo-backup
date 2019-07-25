@@ -14,7 +14,7 @@ abbrlink: 77c23cfe
 # 使用技巧
 用VIM开发Android应用其实是相当困难的, 有多次都想要放弃了, 但都在用其他编辑器需要每天重启4-5次虚拟机的压力下坚持下来了, 距今已经有一年多了. 这里有些关于VIM开发Android的小技巧可以分享一下
 
-### 插件
+## 插件
 
 ```vimscript
 Plugin 'VundleVim/Vundle.vim'
@@ -37,19 +37,28 @@ Plugin 'vim-airline/vim-airline-themes'
 7. plantuml-syntax, 这个是使用plantuml的插件, plantuml是一款非常非常好用的uml工具, 用起来会上瘾, 它是将画uml的方式用代码写出来, 强烈推荐这款工具, plantuml-syntax就是将其语法高亮
 8. vim-airline和vim-airline-themes这两个插件就是让你的tab显示的更加漂亮
 
-### 查看Android源码
-对于不管是不是Android系统开发工程师来说, 阅读Android frameworks层的源码那都是必不可少的, 建议有条件的可以搭建一个OpenGrok, 搜索起来不要太快, 那么怎么用vim看代码呢
-##### 打开文件
+## 查看Android源码
+对于不管是不是Android系统开发工程师来说, 阅读Android frameworks层的源码那都是必不可少的, 建议有条件的可以搭建一个OpenGrok, 搜索起来不要太快, 回到正题, 那么怎么用vim看Android源码呢
+### 打开文件
 我打开文件一般都是先切换到android根目录下面先`source build/envsetup;lunch`一下, 新建一个终端tab, 然后进入到对应目录, 比如: `cd package/apps/Settings;vim .`, 这样有几个好处
 1. 一个终端tab只用做编译代码, 其他的tab用来看代码. 
-2. 进入到Settings目录下面可以方便搜索代码和文件, 因为fzf和ag都是在当前目录下搜索, 所以如果是查看Settings目录下, 进入这个目录刚刚好<br>
+2. 进入到Settings目录下面可以方便搜索代码和文件, 因为fzf和ag都是在当前目录下搜索, 所以如果是查看Settings目录下, 进入这个目录刚刚好
+
 如果是需要看frameworks的代码的话, 最好是进入frameworks的下一层目录例如`frameworks/base`, 因为frameworks下面的模块也是相当多的
 
-##### 搜索文件
+<iframe height=450 width=1000 src="open-dir.gif" frameborder=0 allowfullscreen></iframe>
+
+### 搜索文件
 我一般使用的都是fzf进行搜索文件, 终端也可以用, 一般都是设置快捷键`nnoremap <C-T> :FZF<CR>`, 使用Ctrl+T打开搜索界面, 搜索完之后使用Ctrl+T新建的tab中打开文件, 用快捷键gt或者是gT, 进行切换tab
-##### 搜索源码
+
+<iframe height=450 width=1000 src="search-file.gif" frameborder=0 allowfullscreen></iframe>
+
+### 搜索源码
 使用Ack的时候, 如果设置了`let g:ackprg = 'ag --nogroup --nocolor --column'`, 可以直接使用`:Ag`,搜完之后使用Ctrl+T在新建的tab中打开文件, 如果没有设置, 则要使用`:Ack!`, 不过Ack搜索是放在Quickfix中
-##### 跳转
+
+<iframe height=450 width=1000 src="ag-search.gif" frameborder=0 allowfullscreen></iframe>
+
+### 跳转
 一般文件内部跳转源码我都是都是`/`搜索的方式进行搜索, 或者是gD快捷键进行搜索, gD其实是go to define的意思, 但是这个比较蠢, 只会跳转到第一次出现的地方. 不过也有一些小技巧, 比如搜索内部类的时候可以带上class前缀, 搜索方法的时候带上返回值, 搜索属性定义或者是类导入的时候带上分号, 搜索赋值或初始化的时候带上空格+等号, 其实跳转也不是很慢, 当然文件外部跳转还是使用Ack
 还有翻页, 我一般都是Ctrl+D进行半页半页的翻, 然后会设置`set mouse=n`, 让normal模式可以也可以滑动鼠标, 并且也可以将光标精准的放到对应的位置, gg可以跳到文件开头,G可以跳转到文件尾, nG可以跳转到对应的行
 ##### 查看LOG
@@ -58,14 +67,16 @@ Plugin 'vim-airline/vim-airline-themes'
 
 后来找到一种新的方式, 因为"%保存了当前打开文件文件的相对路径, 所以直接用`:! ag search_word %`命令就可以获取了, 
 
-### 写代码
+## 写代码
 编辑器没有自动提示写代码确实很头疼, 我有几次也很想放弃了, 有一些java语言自动完成的插件, 但是都不怎么符合要求, 下面有一些小技巧可以加快一些写代码的速度
-##### 复制和粘贴
+### 复制和粘贴
 都知道dd,yy快捷键是剪切和复制, 用p进行粘贴, 但是复制到系统剪贴板的快捷键"+实在是太反人类了, 所以我一般都是将其映射到一个快捷键`nnoremap <space>y "+`, 映射的时候得注意习惯, 因为复制的次数太多的话, 这个习惯就没法改了, 现在已经变成神经自动反应了,需要复制的先打Space+y
-##### 自动补全
+### 自动补全
 这个真的能提高很多写代码的效率, 快捷键Ctrl-N可以自动补全曾经出现的字符串, 跟IDE的自动补全非常相似, Ctrl-N选择下一个, Ctrl-P选择上一个, 而且这个是可以找到你打开的目录下所有的文件中出现过的字符串, 这个跟IDE的补全几乎就是一样的, 除了不能自动补全SDK下的代码, 况且作为系统应用, 很多隐藏类和隐藏方法也不能进行补全
 
-##### 善用abbreviation
+<iframe height=450 width=1000 src="autocomplete.gif" frameborder=0 allowfullscreen></iframe>
+
+### 善用abbreviation
 这个是类似于Android Studio里面的Live Templates, 当然是无法像LiveTemplates那么功能那么多, 但也足够方便了. 下面我的一些例子
 ```vimscript
 iabbrev syso System.out.println("");<ESC>2hi "添加<ESC>2hi的目的是让光标停留在双引号中间
@@ -76,9 +87,12 @@ iabbrev constS public static final String
 iabbrev docj /**<cr><cr>/<ESC>kA
 ```
 使用这个iabbrev的方法很简单, 保证是在插入模式, 输入`logd`然后再输入空格或者是Ctrl+]就可以变成了`Log.d(TAG, "");`.
-abbreviation的设计的目的用一句话简单概括就是:**代替你的手**, 所以你在设计abbreviation的时候**将你手操作的键一个个的输入到abbreviation里面**
 
-### 另外的一些小技巧
+<iframe height=450 width=1000 src="iabbrev.gif" frameborder=0 allowfullscreen></iframe>
+
+abbreviation的设计的目的用一句话简单概括就是:**代替你的手**, 所以你在设计abbreviation的时候**只需要将你想要操作的键一个个的输入到abbreviation里面**, 一个abbrev形成了, 如果你对shell足够熟悉, 几乎可以将AndroidStudio的LiveTemplates完全添加进去
+
+## 另外的一些小技巧
 通过以上的小技巧可以应付大部分Android系统应用开发的问题, 有些个人使用的一些小技巧, 主观性比较强:
 1. 双击双引号可以为一个单词添加双引号,`nnoremap "" viw<esc>a"<esc>hbi"<esc>lel"` 对于String的用的比较多
 2. 用Ctrl+J代替ESC键`inoremap <C-J> <esc>`, 因为ESC键实在是离我太远了
