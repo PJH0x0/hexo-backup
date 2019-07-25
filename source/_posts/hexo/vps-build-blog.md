@@ -25,7 +25,7 @@ ssh-keygen -t rsa
 ```
 
 ## 通过ssh连接vps
-1. 使用以下命令拷贝id到本地, 默认端口号:22
+1. 使用以下命令拷贝id到本地, 端口号: VPS中的SSH端口号
 ```Shell 
 ssh-copy-id -p 端口号 root@ip_address
 ```
