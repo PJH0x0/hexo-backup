@@ -7,6 +7,7 @@ tags:
 categories:
   - android
   - wifi
+abbrlink: 141bf3b4
 ---
 
 本文主要的目的是理清Android O和Android P之间Wifi enable流程的变化, 这部分主要是在WifiStateMachine状态机的状态变化方面, 增加了WifiStateMachinePrime类, 减少了WifiStateMachine部分的状态. 接下来看一下具体的流程变化
