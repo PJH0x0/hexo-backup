@@ -46,17 +46,17 @@ Plugin 'vim-airline/vim-airline-themes'
 
 如果是需要看frameworks的代码的话, 最好是进入frameworks的下一层目录例如`frameworks/base`, 因为frameworks下面的模块也是相当多的
 
-<iframe height=360 width=640 src="open-dir.gif" frameborder=0 allowfullscreen></iframe>
+<img height=360 width=640 src="open-dir.gif"></img>
 
 ### 搜索文件
 我一般使用的都是fzf进行搜索文件, 终端也可以用, 一般都是设置快捷键`nnoremap <C-T> :FZF<CR>`, 使用Ctrl+T打开搜索界面, 搜索完之后使用Ctrl+T新建的tab中打开文件, 用快捷键gt或者是gT, 进行切换tab
 
-<iframe height=360 width=640 src="search-file.gif" frameborder=0 allowfullscreen></iframe>
+<img height=360 width=640 src="search-file.gif"></img>
 
 ### 搜索源码
 使用Ack的时候, 如果设置了`let g:ackprg = 'ag --nogroup --nocolor --column'`, 可以直接使用`:Ag`,搜完之后使用Ctrl+T在新建的tab中打开文件, 如果没有设置, 则要使用`:Ack!`, 不过Ack搜索是放在Quickfix中. 
 
-<iframe height=360 width=640 src="ag-search.gif" frameborder=0 allowfullscreen></iframe>
+<img height=360 width=640 src="ag-search.gif"></img>
 
 如果是文件内部搜索的话用vim的斜杠搜索就够了, `n`是下一个搜索结果, `N`是上一个搜索结果, 不过也有一些小技巧, 比如搜索内部类的时候可以带上class前缀, 搜索方法的时候带上返回值, 搜索属性定义或者是类导入的时候带上分号, 搜索赋值或初始化的时候带上空格+等号, 
 
@@ -76,7 +76,7 @@ Plugin 'vim-airline/vim-airline-themes'
 ### 自动补全
 这个真的能提高很多写代码的效率, 快捷键`Ctrl-N`可以自动补全曾经出现的字符串, 跟IDE的自动补全非常相似, `Ctrl-N`选择下一个, `Ctrl-P`选择上一个, 而且这个是可以找到你打开的目录下所有的文件中出现过的字符串, 这个跟IDE的补全几乎就是一样的, 除了不能自动补全SDK下的代码, 况且作为系统应用, 很多隐藏类和隐藏方法也不能进行补全
 
-<iframe height=360 width=640 src="autocomplete.gif" frameborder=0 allowfullscreen></iframe>
+<img height=360 width=640 src="autocomplete.gif"></img>
 
 ### 善用abbreviation
 这个是类似于Android Studio里面的Live Templates, 当然是无法像LiveTemplates那么功能那么多, 但也足够方便了. 下面我的一些例子
@@ -90,7 +90,7 @@ iabbrev docj /**<cr><cr>/<ESC>kA
 ```
 使用这个iabbrev的方法很简单, 保证是在插入模式, 输入`logd`然后再输入空格或者是Ctrl+]就可以变成了`Log.d(TAG, "");`.
 
-<iframe height=360 width=640 src="iabbrev.gif" frameborder=0 allowfullscreen></iframe>
+<img height=360 width=640 src="iabbrev.gif"></img>
 
 abbreviation的设计的目的用一句话简单概括就是:**代替你的手**, 所以你在设计abbreviation的时候**只需要将你想要操作的键一个个的输入到abbreviation里面**, 一个abbrev形成了, 如果你对shell足够熟悉, 几乎可以将AndroidStudio的LiveTemplates全都添加进去
 
