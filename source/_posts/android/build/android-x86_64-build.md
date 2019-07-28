@@ -2,11 +2,12 @@
 title: Android编译x86_64选项
 date: 2019/7/28
 categories:
-    - android
-    - build
+  - android
+  - build
 tags:
   - android
   - build
+abbrlink: 64d4863f
 ---
 
 # 原因
