@@ -1,0 +1,14 @@
+@startuml
+usecase (TelephonyProvider)
+usecase (apns-conf.xml)
+usecase (DcTracker)
+usecase (ApnSettings)
+usecase (telephony.db)
+actor (user)
+
+(TelephonyProvider) -left-> (apns-conf.xml) : 解析apn
+(TelephonyProvider) -up-> (telephony.db) : 存/取 apn至数据库
+(ApnSettings) -left-> (TelephonyProvider) : 取出apn
+(DcTracker) -up-> (TelephonyProvider) : 取出apn用于注册网络
+(ApnSettings) -right-> (user) : 显示给用户
+@enduml
