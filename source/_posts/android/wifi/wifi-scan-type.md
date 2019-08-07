@@ -7,6 +7,7 @@ categories:
 tags:
   - android
   - source
+abbrlink: f0e0a512
 ---
 # Android O Wifi扫描场景
 抄自[Android wifi扫描机制(Android O)](https://blog.csdn.net/h784707460/article/details/79658950), 有想研究的可以直接看原文, 就是排版有点不好
@@ -17,7 +18,7 @@ tags:
 
 
 # Android P Wifi扫描场景
-Android P取消了第4情况固定扫描, 其实第4情况在Android O中没有亮屏和灭屏之分. 第1, 2种情况属于Single Scan, 第3种情况属于PNO Scan
+Android P取消了第4种情况固定扫描, 其实第4种情况在Android O中没有亮屏和灭屏之分. 第1, 2种情况属于Single Scan, 第3种情况属于PNO Scan
 
 # 如何触发
 ## 第一种情况
@@ -44,16 +45,12 @@ private void updateWifiState(int state) {
             mScanner.resume();
         }
     } else {
-        clearAccessPointsAndConditionallyUpdate();
-        mLastInfo = null;
-        mLastNetworkInfo = null;
         if (mScanner != null) {
             //停止扫描
             mScanner.pause();
         }
         mStaleScanResults = true;
     }
-    mListener.onWifiStateChanged(state);
 }
 
 ```
@@ -62,32 +59,9 @@ private void updateWifiState(int state) {
 @Override
 @MainThread
 public void onStart() {
-    // fetch current ScanResults instead of waiting for broadcast of fresh results
-    forceUpdate();
-
-    registerScoreCache();
-
-    mNetworkScoringUiEnabled =
-            Settings.Global.getInt(
-                    mContext.getContentResolver(),
-                    Settings.Global.NETWORK_SCORING_UI_ENABLED, 0) == 1;
-
-    mMaxSpeedLabelScoreCacheAge =
-            Settings.Global.getLong(
-                    mContext.getContentResolver(),
-                    Settings.Global.SPEED_LABEL_CACHE_EVICTION_AGE_MILLIS,
-                    DEFAULT_MAX_CACHED_SCORE_AGE_MILLIS);
-
+    //省略无关代码
     //触发扫描
     resumeScanning();
-    if (!mRegistered) {
-        mContext.registerReceiver(mReceiver, mFilter, null /* permission */, mWorkHandler);
-        // NetworkCallback objects cannot be reused. http://b/20701525 .
-        mNetworkCallback = new WifiTrackerNetworkCallback();
-        mConnectivityManager.registerNetworkCallback(
-                mNetworkRequest, mNetworkCallback, mWorkHandler);
-        mRegistered = true;
-    }
 }
 public void resumeScanning() {
     if (mScanner == null) {
@@ -147,9 +121,132 @@ class Scanner extends Handler {
 ```
 上面说了如何触发扫描的方式, 那么如何停止扫描呢? 上面第一种方式中当wifi没打开的时候会触发, 另外就是`onStop`生命周期的时候也会进行触发, 这里不再细述
 
-## 第二种情况
-这种情况下也有两种方式进行触发:
-1. 通过
+## 第二/三种情况
+这两种种情况下有比较多触发方式, 但是主要的还是监听连接状态变化以及亮灭屏变化触发扫描:
+1. `handleConnectionStateChanged()`, 这个主要由`WifiStateMachine`的状态进行调用传入不同参数
+```java
+public void handleConnectionStateChanged(int state) {
+    localLog("handleConnectionStateChanged: state=" + stateToString(state));
+
+    mWifiState = state;
+
+    if (mWifiState == WIFI_STATE_CONNECTED) {
+        mOpenNetworkNotifier.handleWifiConnected();
+        mCarrierNetworkNotifier.handleWifiConnected();
+    }
+
+    // Reset BSSID of last connection attempt and kick off
+    // the watchdog timer if entering disconnected state.
+    if (mWifiState == WIFI_STATE_DISCONNECTED) {
+        mLastConnectionAttemptBssid = null;
+        scheduleWatchdogTimer();
+        startConnectivityScan(SCAN_IMMEDIATELY);
+    } else {
+        startConnectivityScan(SCAN_ON_SCHEDULE);
+    }
+}
+
+```
+2. `handleScreenStateChanged()`, 这个也是由`WifiStateMachine`进行调用的
+```java
+public void handleScreenStateChanged(boolean screenOn) {
+    localLog("handleScreenStateChanged: screenOn=" + screenOn);
+
+    mScreenOn = screenOn;
+
+    mOpenNetworkNotifier.handleScreenStateChanged(screenOn);
+    mCarrierNetworkNotifier.handleScreenStateChanged(screenOn);
+
+    startConnectivityScan(SCAN_ON_SCHEDULE);
+}
+```
+
+
+```java
+private void startConnectivityScan(boolean scanImmediately) {
+    localLog("startConnectivityScan: screenOn=" + mScreenOn
+            + " wifiState=" + stateToString(mWifiState)
+            + " scanImmediately=" + scanImmediately
+            + " wifiEnabled=" + mWifiEnabled
+            + " wifiConnectivityManagerEnabled="
+            + mWifiConnectivityManagerEnabled);
+
+    if (!mWifiEnabled || !mWifiConnectivityManagerEnabled) {
+        return;
+    }
+
+    // Always stop outstanding connecivity scan if there is any
+    stopConnectivityScan();
+
+    // Don't start a connectivity scan while Wifi is in the transition
+    // between connected and disconnected states.
+    if (mWifiState != WIFI_STATE_CONNECTED && mWifiState != WIFI_STATE_DISCONNECTED) {
+        return;
+    }
+
+    if (mScreenOn) {
+        //触发第二种情况扫描
+        startPeriodicScan(scanImmediately);
+    } else {
+        //触发第三中情况扫描
+        if (mWifiState == WIFI_STATE_DISCONNECTED && !mPnoScanStarted) {
+            startDisconnectedPnoScan();
+        }
+    }
+}
+```
+### 第二种情况扫描分析
+```java
+private void startPeriodicScan(boolean scanImmediately) {
+    mPnoScanListener.resetLowRssiNetworkRetryDelay();
+
+    // No connectivity scan if auto roaming is disabled.
+    if (mWifiState == WIFI_STATE_CONNECTED && !mEnableAutoJoinWhenAssociated) {
+        return;
+    }
+
+    // Due to b/28020168, timer based single scan will be scheduled
+    // to provide periodic scan in an exponential backoff fashion.
+    if (scanImmediately) {
+        resetLastPeriodicSingleScanTimeStamp();
+    }
+    mPeriodicSingleScanInterval = PERIODIC_SCAN_INTERVAL_MS;
+    startPeriodicSingleScan();
+}
+private void startPeriodicSingleScan() {
+    long currentTimeStamp = mClock.getElapsedSinceBootMillis();
+
+    //scanImmediately的情况下不会走这里
+    if (mLastPeriodicSingleScanTimeStamp != RESET_TIME_STAMP) {
+        long msSinceLastScan = currentTimeStamp - mLastPeriodicSingleScanTimeStamp;
+        if (msSinceLastScan < PERIODIC_SCAN_INTERVAL_MS) {
+            localLog("Last periodic single scan started " + msSinceLastScan
+                    + "ms ago, defer this new scan request.");
+            schedulePeriodicScanTimer(PERIODIC_SCAN_INTERVAL_MS - (int) msSinceLastScan);
+            return;
+        }
+    }
+
+
+        mLastPeriodicSingleScanTimeStamp = currentTimeStamp;
+        startSingleScan(isFullBandScan, WIFI_WORK_SOURCE);
+        schedulePeriodicScanTimer(mPeriodicSingleScanInterval);
+
+        // Set up the next scan interval in an exponential backoff fashion.
+        mPeriodicSingleScanInterval *= 2;
+        if (mPeriodicSingleScanInterval >  MAX_PERIODIC_SCAN_INTERVAL_MS) {
+            mPeriodicSingleScanInterval = MAX_PERIODIC_SCAN_INTERVAL_MS;
+        }
+}
+
+```
+如果`scanImmediately == true`的话, `mLastPeriodicSingleScanTimeStamp`会被重置为`RESET_TIME_STAMP`, 所以会直接扫描. 而这个算法大概的意思是:<br>
+1. 第一次扫描算作没有间隔, 第一次和第二次之间的扫描的间隔是20s
+2. 每扫描一次增加一倍的扫描时间, 直到最大的160s, 也就6次就会达到最大值
+3. 6次之后的每次扫描时间都是160s, 直到再次触发屏幕亮屏
+
+### 第三种情况扫描分析
+第三种PNO 扫描只有在灭屏并且无连接的情况下触发, 这种情况会单独有一个章节进行分析
 
 
 
