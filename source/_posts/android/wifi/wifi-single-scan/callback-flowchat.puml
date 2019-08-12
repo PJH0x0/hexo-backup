@@ -1,0 +1,13 @@
+@startuml callback-flowchat
+start
+:IWifiScannerImpl;
+-> OnScanResultsReady();
+:WificondControl.ScanEventHandler;
+-> broadcastScanResultEvent();
+:WifiMonitor;
+-> sendMessage(SCAN_RESULTS_EVENT);
+:WificondScannerImpl;
+-> pollLatestScanData();
+
+end
+@enduml

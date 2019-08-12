@@ -10,14 +10,14 @@ tags:
 abbrlink: 8e7e943f
 ---
 
-Wifi扫描需要分为三个阶段进行解析:
+Wifi扫描可以分为三个个阶段进行解析:
 1. 第一阶段是扫描阶段, 这个阶段会发送扫描指令给驱动进行扫描
-2. 第二阶段是获取扫描结果, 这个阶段也是发送获取扫描结果指令给驱动获取扫描结果
-3. 预阶段, 这个阶段主要是用于注册回调用于通知何时获取扫描结果的
+2. 第二阶段是回调阶段, 这个阶段主要是接收到内核扫描成功的回复后触发的回调
+2. 第三阶段是获取扫描结果,这个阶段是接收到回调之后发送获取扫描结果指令给内核获取扫描结果
 
 # 时序图
 这个是时序图是Wifi打开完成之后触发的扫描流程
-![Wifi扫描流程](sequence.png)
+![Wifi扫描流程](wifi-scan.png)
 
 # 扫描阶段
 
@@ -226,6 +226,39 @@ public boolean scan(@NonNull String ifaceName,
 2. scanType, 这个有三种类型`TYPE_LOW_LATENCY`,`TYPE_LOW_POWER`, `TYPE_HIGH_ACCURACY`, 一般都是`TYPE_HIGH_ACCURACY`这种类型
 3. feqs, 这个是扫描信道的频率, 分为2.4GHz和5GHz
 4. hiddenNetworkSSIDs, 这个扫描隐藏热点的SSID, 这个一般为空, 只有当用户在添加网络的高级选项选择了是隐藏网络选项, 这个才会添加对应ssid, 硬件也会主动去扫描这个ssid的热点
-至于C++层的处理感觉和Java层差不多, 也是处理参数, 最后是通过socket与内核进行通信, 发送`NL80211_CMD_TRIGGER_SCAN`触发扫描
 
+至于C++层的处理和Java层差不多, 也是处理参数, 最后是通过socket与内核进行通信, 发送`NL80211_CMD_TRIGGER_SCAN`命令触发扫描
+
+# 回调阶段
+## 注册回调
+注册回调的分为两部分:
+1. `WificondScannerImpl`向`WifiMonitor`注册回调, 这个是`WificondScannerImpl`初始化的时候完成`wifiMonitor.registerHandler(mIfaceName,WifiMonitor.PNO_SCAN_RESULTS_EVENT, mEventHandler);`
+2. 在enable wifi的时候`WificondControl`向`IWifiScannerImpl`注册回调, 
+```java
+try {
+    IWifiScannerImpl wificondScanner = clientInterface.getWifiScannerImpl();
+    if (wificondScanner == null) {
+        Log.e(TAG, "Failed to get WificondScannerImpl");
+        return null;
+    }
+    mWificondScanners.put(ifaceName, wificondScanner);
+    Binder.allowBlocking(wificondScanner.asBinder());
+    ScanEventHandler scanEventHandler = new ScanEventHandler(ifaceName);
+    mScanEventHandlers.put(ifaceName,  scanEventHandler);
+    wificondScanner.subscribeScanEvents(scanEventHandler);
+    PnoScanEventHandler pnoScanEventHandler = new PnoScanEventHandler(ifaceName);
+    mPnoScanEventHandlers.put(ifaceName,  pnoScanEventHandler);
+    wificondScanner.subscribePnoScanEvents(pnoScanEventHandler);
+} catch (RemoteException e) {
+    Log.e(TAG, "Failed to refresh wificond scanner due to remote exception");
+}
+```
+## 回调过程
+回调过程具体流程如下
+![callback-flowchat](callback-flowchat.png)
+
+# 获取扫描结果
+获取wifi扫描结果也分两部分
+## 应用层获取
+这个是属于界面获取wifi扫描结果用于展示
 
