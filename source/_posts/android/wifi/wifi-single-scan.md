@@ -16,13 +16,19 @@ Wifi扫描可以分为三个个阶段进行解析:
 2. 第三阶段是获取扫描结果,这个阶段是接收到回调之后发送获取扫描结果指令给内核获取扫描结果
 
 # 时序图
-这个是时序图是Wifi打开完成之后触发的扫描流程
+这个是时序图是Wifi打开完成之后触发的扫描流程, 包括触发扫描, 注册回调流程, 获取及获取扫描结果三个部分
+这里说明一下简写, 如果用全写的话太长了
+1. WSSI : WifiScanningServiceImpl
+2. CH : ClientHandler
+3. WSSSM : WifiSingleScanStateMachine
+4. DSS : DriverStartedState
 ![Wifi扫描流程](wifi-scan.png)
 
 # 扫描阶段
 
 这个阶段触发的方式很多, 详情见*Android P Wifi扫描场景*, 但最终都是调用`WifiScanner`的`startScan()`方法
 ```java
+//WifiScanner
 public void startScan(ScanSettings settings, ScanListener listener, WorkSource workSource) {
     Preconditions.checkNotNull(listener, "listener cannot be null");
     int key = addListener(listener);
@@ -37,6 +43,7 @@ public void startScan(ScanSettings settings, ScanListener listener, WorkSource w
 这里使用了`AsyncChannel`进行传递消息, `AsyncChannel`的原理就是利用了Android`Messenger`来在进程间通信, `Messenger`的介绍可以看一下[Android 基于Message的进程间通信 Messenger完全解析](https://blog.csdn.net/lmj623565791/article/details/47017485).
 理解`AsyncChannel`传递消息的关键在于`Messenger`的来源, 目标`Messenger`的获取一般都是在初始化的时候
 ```java
+//WifiScanner
 public WifiScanner(Context context, IWifiScanner service, Looper looper) {
     Messenger messenger = null;
     try {
@@ -48,6 +55,7 @@ public WifiScanner(Context context, IWifiScanner service, Looper looper) {
 ```
 这里就要看是谁继承了这个`IWifiScanner`, 这个命名方式明显是一个AIDL的命名, 最后查到出处是`public class WifiScanningServiceImpl extends IWifiScanner.Stub`, 接下来是找到`Handler`处理消息的地方.
 ```java
+//WifiScanningServiceImpl
 @Override
 public Messenger getMessenger() {
     if (mClientHandler != null) {
@@ -72,6 +80,7 @@ private class ClientHandler extends WifiHandler {
 ```
 接下来又会进入到StateMachine当中, 正常处理这条消息的是`DriverStartedState`.
 ```java
+//WifiScanningServiceImpl$WifiSingleScanStateMachine
 class DriverStartedState extends State {
     @Override
     public boolean processMessage(Message msg) {
@@ -94,7 +103,6 @@ class DriverStartedState extends State {
                     // after finishing the current scan.
                     if (getCurrentState() == mScanningState) {
                         if (activeScanSatisfies(scanSettings)) {
-                            //下下次扫描
                             mActiveScans.addRequest(ci, handler, workSource, scanSettings);
                         } else {
                             //下一次扫描
@@ -116,8 +124,9 @@ class DriverStartedState extends State {
     }
 }
 ```
-这里需要区分是否正在扫描,如果正在扫描的话会延迟到下一次的扫描或者进入到`IdleState`
+这里有一个比较有趣的是正在扫描的状况, 如果正在扫描的扫描参数相同的话, 那么直接加入到mActiveScans中, 具体我们留到获取扫描结果的时候分析, 如果不相同则留到下次扫描的时候作为参数
 ```java
+//WifiScanningServiceImpl$WifiSingleScanStateMachine
 class IdleState extends State {
     @Override
     public void enter() {
@@ -133,6 +142,7 @@ class IdleState extends State {
 ```
 接下来是`tryToStartNewScan()`
 ```java
+//WifiScanningServiceImpl$WifiSingleScanStateMachine
 void tryToStartNewScan() {
     //省略了很多参数处理,但是这些参数处理也很重要
     WifiNative.ScanSettings settings = new WifiNative.ScanSettings();
@@ -173,13 +183,14 @@ void tryToStartNewScan() {
     }
 }
 ```
-可以看到Wifi扫描的参数都是从`mPendingScans`中获取, 这也是为何加入到`mActiveScans`里面的参数需要两次之后才能扫描到,扫描完成之后会交换`mActiveScans`和`mPendingScans`, 这波操作目前还没弄清是什么意思
+可以看到Wifi扫描的参数都是从`mPendingScans`中获取, 扫描完成之后会交换`mActiveScans`和`mPendingScans`, 并清除`mPendingScans`, `mActiveScans`用于标记是谁触发的扫描, 需要向它返回扫描结果
 
 往下是`WifiScannerImpl`, 这个类有两个实现`HalWifiScannerImpl`和`WificondScannerImpl`, 但是`HalWifiScannerImpl`是委托`WificondScannerImpl`进行处理, `WificondScannerImpl`主要处理频率参数.
 可以看到以上都是处理参数的过程, 这里有一份相关参数的类图, 大部分参数都不知道有什么用.
 ![class-param](class-param.png)
 经过参数处理之后最后调用到`WificondControl.scan()`, `WificondControl`通过HIDL与C++进行通信
 ```java
+//WificondControl
 public boolean scan(@NonNull String ifaceName,
                     int scanType,
                     Set<Integer> freqs,
@@ -235,6 +246,7 @@ public boolean scan(@NonNull String ifaceName,
 1. `WificondScannerImpl`向`WifiMonitor`注册回调, 这个是`WificondScannerImpl`初始化的时候完成`wifiMonitor.registerHandler(mIfaceName,WifiMonitor.PNO_SCAN_RESULTS_EVENT, mEventHandler);`
 2. 在enable wifi的时候`WificondControl`向`IWifiScannerImpl`注册回调, 
 ```java
+//WificondControl
 try {
     IWifiScannerImpl wificondScanner = clientInterface.getWifiScannerImpl();
     if (wificondScanner == null) {
@@ -254,11 +266,181 @@ try {
 }
 ```
 ## 回调过程
-回调过程具体流程如下
+回调过程具体流程如下, 最终是由`WificondScannerImpl`处理回调消息
 ![callback-flowchat](callback-flowchat.png)
 
 # 获取扫描结果
 获取wifi扫描结果也分两部分
 ## 应用层获取
-这个是属于界面获取wifi扫描结果用于展示
+由设置或者是开机向导界面获取wifi扫描结果显示给用户, 从`WifiManager.getScanResults()`开始到`ScanRequestProxy` 返回扫描结果, 这个流程是是比较简单的, 但是有个问题, 这个扫描是从哪来的?
 
+## 系统层获取
+由`WificondScannerImpl`处理回调消息之后获取扫描结果. 先从`WifiNative`获取扫描结果
+```java
+//WificondScannerImpl
+private void pollLatestScanData() {
+    synchronized (mSettingsLock) {
+        if (mLastScanSettings == null) {
+             // got a scan before we started scanning or after scan was canceled
+            return;
+        }
+
+        // 获取Scan results
+        mNativeScanResults = mWifiNative.getScanResults(mIfaceName);
+        //省略Scan results处理过程
+            mLatestSingleScanResult = new WifiScanner.ScanData(0, 0, 0,
+                    isAllChannelsScanned(mLastScanSettings.singleScanFreqs),
+                    singleScanResults.toArray(new ScanResult[singleScanResults.size()]));
+        //发送消息给WifiSingleScanStateMachine, 通知可以取返回结果了
+            mLastScanSettings.singleScanEventHandler
+                    .onScanStatus(WifiNative.WIFI_SCAN_RESULTS_AVAILABLE);
+
+        mLastScanSettings = null;
+    }
+}
+```
+通过`WifiNative`获取扫描的过程不再继续分析了, 因为这个最终还是调用到`WificondCtrol`里面和`IWifiServiceImpl`进行通信获取, 接下来说一下回调结果
+```java
+//WifiScanningServiceImpl$WifiSingleScanStateMachine
+@Override
+public void onScanStatus(int event) {
+    if (DBG) localLog("onScanStatus event received, event=" + event);
+    switch(event) {
+        case WifiNative.WIFI_SCAN_RESULTS_AVAILABLE:
+        case WifiNative.WIFI_SCAN_THRESHOLD_NUM_SCANS:
+        case WifiNative.WIFI_SCAN_THRESHOLD_PERCENT:
+            sendMessage(CMD_SCAN_RESULTS_AVAILABLE);
+            break;
+        case WifiNative.WIFI_SCAN_FAILED:
+            sendMessage(CMD_SCAN_FAILED);
+            break;
+        default:
+            Log.e(TAG, "Unknown scan status event: " + event);
+            break;
+    }
+}
+//WifiScanningServiceImpl$WifiSingleScanStateMachine$ScanningState
+@Override
+public boolean processMessage(Message msg) {
+    switch (msg.what) {
+        case CMD_SCAN_RESULTS_AVAILABLE:
+            mWifiMetrics.incrementScanReturnEntry(
+                    WifiMetricsProto.WifiLog.SCAN_SUCCESS,
+                    mActiveScans.size());
+            //通知WifiScanner
+            reportScanResults(mScannerImpl.getLatestSingleScanResults());
+            mActiveScans.clear();
+            transitionTo(mIdleState);
+            return HANDLED;
+        case CMD_FULL_SCAN_RESULTS:
+            reportFullScanResult((ScanResult) msg.obj, /* bucketsScanned */ msg.arg2);
+            return HANDLED;
+        case CMD_SCAN_FAILED:
+            mWifiMetrics.incrementScanReturnEntry(
+                    WifiMetricsProto.WifiLog.SCAN_UNKNOWN, mActiveScans.size());
+            sendOpFailedToAllAndClear(mActiveScans, WifiScanner.REASON_UNSPECIFIED,
+                    "Scan failed");
+            transitionTo(mIdleState);
+            return HANDLED;
+        default:
+            return NOT_HANDLED;
+    }
+```
+这个`mScannerImpl.getLatestSingleScanResults()`返回的是`mLatestSingleScanResult`, `reportScanResults()`方法就是通过Messenger来通知WifiScanner处理扫描结果, WifiScanner就会通知ScanRequestProxy处理对应扫描结果,并保存
+```java
+//WifiScanningServiceImpl$WifiSingleScanStateMachine
+void reportScanResults(ScanData results) {
+    if (results != null && results.getResults() != null) {
+        if (results.getResults().length > 0) {
+            mWifiMetrics.incrementNonEmptyScanResultCount();
+        } else {
+            mWifiMetrics.incrementEmptyScanResultCount();
+        }
+    }
+    ScanData[] allResults = new ScanData[] {results};
+    //返回扫描结果
+    for (RequestInfo<ScanSettings> entry : mActiveScans) {
+        ScanData[] resultsToDeliver = ScanScheduleUtil.filterResultsForSettings(
+                mChannelHelper, allResults, entry.settings, -1);
+        WifiScanner.ParcelableScanData parcelableResultsToDeliver =
+                new WifiScanner.ParcelableScanData(resultsToDeliver);
+        logCallback("singleScanResults",  entry.clientInfo, entry.handlerId,
+                describeForLog(resultsToDeliver));
+        entry.reportEvent(WifiScanner.CMD_SCAN_RESULT, 0, parcelableResultsToDeliver);
+        // make sure the handler is removed
+        entry.reportEvent(WifiScanner.CMD_SINGLE_SCAN_COMPLETED, 0, null);
+    }
+
+    WifiScanner.ParcelableScanData parcelableAllResults =
+            new WifiScanner.ParcelableScanData(allResults);
+    for (RequestInfo<Void> entry : mSingleScanListeners) {
+        logCallback("singleScanResults",  entry.clientInfo, entry.handlerId,
+                describeForLog(allResults));
+        entry.reportEvent(WifiScanner.CMD_SCAN_RESULT, 0, parcelableAllResults);
+    }
+
+    if (results.isAllChannelsScanned()) {
+        mCachedScanResults.clear();
+        mCachedScanResults.addAll(Arrays.asList(results.getResults()));
+    }
+}
+```
+这里就用到mActiveScans, 把扫描结果返回到到对应的调用者中, 最终是会回调到`WifiScanner`中
+```java
+//WifiScanner$ServiceHandler
+@Override
+public void handleMessage(Message msg) {
+    switch (msg.what) {
+        case AsyncChannel.CMD_CHANNEL_FULLY_CONNECTED:
+            return;
+        case AsyncChannel.CMD_CHANNEL_DISCONNECTED:
+            Log.e(TAG, "Channel connection lost");
+            // This will cause all further async API calls on the WifiManager
+            // to fail and throw an exception
+            mAsyncChannel = null;
+            getLooper().quit();
+            return;
+    }
+
+    Object listener = getListener(msg.arg2);
+
+    if (listener == null) {
+        if (DBG) Log.d(TAG, "invalid listener key = " + msg.arg2);
+        return;
+    } else {
+        if (DBG) Log.d(TAG, "listener key = " + msg.arg2);
+    }
+
+    switch (msg.what) {
+        case CMD_SCAN_RESULT :
+            ((ScanListener) listener).onResults(
+                    ((ParcelableScanData) msg.obj).getResults());
+            return;
+
+```
+这里继续回调到`ScanRequestProxy`中
+```java
+//ScanRequestProxy$ScanRequestProxyScanListener 
+@Override
+public void onResults(WifiScanner.ScanData[] scanDatas) {
+    if (mVerboseLoggingEnabled) {
+        Log.d(TAG, "Scan results received");
+    }
+    // For single scans, the array size should always be 1.
+    if (scanDatas.length != 1) {
+        Log.wtf(TAG, "Found more than 1 batch of scan results, Failing...");
+        sendScanResultBroadcastIfScanProcessingNotComplete(false);
+        return;
+    }
+    WifiScanner.ScanData scanData = scanDatas[0];
+    ScanResult[] scanResults = scanData.getResults();
+    if (mVerboseLoggingEnabled) {
+        Log.d(TAG, "Received " + scanResults.length + " scan results");
+    }
+    // Store the last scan results & send out the scan completion broadcast.
+    mLastScanResults.clear();
+    mLastScanResults.addAll(Arrays.asList(scanResults));
+    sendScanResultBroadcastIfScanProcessingNotComplete(true);
+}
+```
+以上, 没得了

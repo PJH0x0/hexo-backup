@@ -1,74 +1,34 @@
 @startuml wifi-scan
-== Start scan ==
-participant WifiStateMachine as c1
-participant WifiTracker as c2
-c1->c2 : sendBroadcast(WifiManager.WIFI_STATE_CHANGED_ACTION)
-participant WifiTracker.Scanner as c3
-c2->c3 : resume()
-c3->c3 : sendMessage(MSG_SCAN)
-c3->c3 : handleMessage(MSG_SCAN)
-participant WifiManager as c4
-c3->c4 : startScan()
-participant WifiServiceImpl as c5
-c4->c5 : startScan() : binder call
-participant ScanRequestProxy as c6
-c5->c6 : startScan()
-participant WifiScanner as c7
-c6->c7 : startScan()
-participant AsyncChannel as c8
-c7->c8 : sendMessage(CMD_START_SINGLE_SCAN)
-participant WifiScanningServiceImpl.ClientHandler as c9
-c8->c9 : sendMessage(CMD_START_SINGLE_SCAN) : binder call
-c9->c9 : handleMessage(CMD_START_SINGLE_SCAN)
-participant WifiScanningServiceImpl.WifiSingleScanStateMachine as c10
-c9->c10 : sendMessage(CMD_START_SINGLE_SCAN)
-participant WifiSingleScanStateMachine.DriverStartedState as c11
-c10->c11 : processMessage(CMD_START_SINGLE_SCAN)
-c11->c10 : tryToStartNewScan()
-participant WificondScannerImpl as c12
-c10->c12 : startSingleScan()
-participant WifiNative as c13
-c12->c13 : scan()
-participant WificondControl as c14
-c13->c14 : scan()
-participant IWifiScannerImpl as c15
-c14->c15 : scan() : bindercall
-== Start scan ==
+==trigger scan==
+Settings -> WifiManager: startScan()
+WifiManager -> WifiServiceImpl : startScan()
+WifiServiceImpl -> ScanRequestProxy : startScan()
+ScanRequestProxy -> WifiScanner : startScan()
+WifiScanner -> WSSI.CH : CMD_START_SINGLE_SCAN
+WSSI.CH -> WSSI.WSSSM : CMD_START_SINGLE_SCAN
+WSSI.WSSSM -> WSSSM.DSS : CMD_START_SINGLE_SCAN
+WSSSM.DSS -> WSSI.WSSSM : tryToStartNewScan()
+WSSI.WSSSM -> WificondScannerImpl : startSingleScan()
+WificondScannerImpl -> WifiNative : scan()
+WifiNative -> WificondControl : scan()
+WificondControl -> IWifiServiceImpl : scan()
+==trigger scan==
 
-== Scan callback ==
-participant WificondControl.ScanEventHandler as c16
-c15->c16 : OnScanResultReady()
-participant WifiMonitor as c17
-c16->c17 : broadcastScanResultEvent()
-c17->c12 : sendMessage(SCAN_RESULTS_EVENT)
-c12->c12 : handleMessage(SCAN_RESULTS_EVENT)
-c12->c12 : pollLatestScanData()
-c12->c13 : getScanResults()
-c13->c14 : getScanResults()
-c14->c15 : getScanResults()
+==register callback==
+WificondScannerImpl -> WifiMonitor : registerHandler(SCAN_RESULTS_EVENT)
+WificondControl -> IWifiServiceImpl : subscribeScanEvents()
+==register callback==
 
-c15->c14 : return NativeScanResult[]
-c14->c13 : return ArrayList<ScanDetail>
-c13->c12 : return ArrayList<ScanDetail>
-
-c12->c10 : onScanStatus()
-c10->c10 : sendMessage(CMD_SCAN_RESULTS_AVAILABLE)
-participant WifiSingleScanStateMachine.ScanningState as c18
-c10->c18 : processMessage(CMD_SCAN_RESULTS_AVAILABLE)
-c18->c12 : getLatestSingleScanResults()
-c12->c18 : return WifiScanner.ScanData
-c18->c10 : reportScanResults()
-c10->c7 : sendMessage(CMD_SCAN_RESULT)
-participant ScanRequestProxy.ScanRequestProxyScanListener as c19
-c7->c19 : onResults()
-c19->c6 : sendScanResultBroadcastIfScanProcessingNotComplete(true)
-c6->c6 : sendScanResultBroadcast(true)
-c6->c2 : sendBroadcast(SCAN_RESULTS_AVAILABLE_ACTION)
-== Scan callback ==
-
-== register callback ==
-c12->c17 : registerHandler()
-c14->c15 : subscribeScanEvents()
-== register callback ==
+==get scan result==
+IWifiServiceImpl -> WificondControl : OnScanResultReady()
+WificondControl -> WifiMonitor : broadcastScanResultEvent()
+WifiMonitor -> WificondScannerImpl : SCAN_RESULTS_EVENT
+WificondScannerImpl -> WificondScannerImpl : pollLatestScanData()
+WificondScannerImpl -> WSSI.WSSSM : onScanStatus()
+WSSI.WSSSM -> WSSSM.ScanningState : CMD_SCAN_RESULTS_AVAILABLE
+WSSSM.ScanningState -> WSSI.WSSSM : reportScanResults()
+WSSI.WSSSM -> WifiScanner : CMD_SCAN_RESULT
+WifiScanner -> ScanRequestProxy : onResults()
+==get scan result==
 
 @enduml
