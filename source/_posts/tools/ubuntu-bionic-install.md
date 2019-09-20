@@ -37,7 +37,10 @@ sudo ubuntu-drivers autoinstall
 # Windows/Ubuntu时间不同步
 处理完之后基本就完成了
 
-# 安装软件
-因为我用的是最小安装, 所以要安装一些软件
+# Ubuntu 16.04升级到18.04
+## 升级出现的问题
+之前在公司使用的是vmware 10.0 + Ubuntu 16.04LTS, 本来是想要重新安装一个Ubuntu 18.04的, 但是安装完成之后发现一直安装不了vmware-tool, 需要安装ifconfig, 但是ifconfig又有依赖包安装不了, 但是之前由16.04升级18.04也还是不成功, 先是什么python版本不对, 然后又需要更换到原始源, 更换之后又老出现连接不上一个ip地址导致升级失败
+## 解决方案
+打开Software&Updates, 然后进入Settings->Ubuntu software, 把能选的都选上,download from选择main server, 然后进入到Updates, 重要安全更新和推荐更新, 回到终端执行`sudo apt update;sudo apt dist-upgrade`, 更新时间会非常长, 建议是晚上前更新
 
 
