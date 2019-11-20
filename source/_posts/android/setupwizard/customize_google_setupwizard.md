@@ -1,11 +1,12 @@
 ---
 title: Android集成自定义Google Setup Wizard
 date: 2019/11/19
-tags: 
+tags:
   - android
   - setupwizard
 categories:
   - android
+abbrlink: a125a8ec
 ---
 
 >前言:本文基于Android P/Q进行的实验,其他版本并不能保证成功
