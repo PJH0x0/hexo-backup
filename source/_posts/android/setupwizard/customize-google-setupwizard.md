@@ -10,7 +10,7 @@ abbrlink: a125a8ec
 ---
 
 >前言:本文基于Android P/Q进行的实验,其他版本并不能保证成功
-Google SetupWizard中文翻译为设置向导, 是GMS应用的一部分, 不过Google提供了文档供OEM厂商或者运营商进行定制, 以下是我对于该文档的一个简单总结:
+Google SetupWizard中文翻译为设置向导, 是GMS应用的一部分, 不过Google提供了文档供OEM厂商或者运营商进行定制, 文档的名称是*Configuring the Setup Wizard*
 # Android.mk设置
 ```shell
 #Android Q library
@@ -64,12 +64,12 @@ public class SuwCustomizationReceiver extends BroadcastReceiver {
     }
 }
 ```
-# 添加raw/目录
-一般使用的是`GmsSampleIntegration`这个应用里面的raw目录,这个应用是Google提供的一段集成自定义SetupWizard的demo例子,一般是在`vendor/${partener_gms}/apps`目录下.
-而raw/这个目录则包含了Google SetupWizard的流程, Google SetupWizard就会按照这些xml的流程跳转到对应的界面, 包括自定义的界面.所以这个raw目录是自定义Google SetupWizard的核心, 无论是添加还是修改页面,都很可能会涉及到
-在移植了这个raw目录之后需要修改一下包名
+# 添加raw目录
+一般使用的是`GmsSampleIntegration`这个应用里面的raw目录,这个应用是Google提供的一段集成自定义SetupWizard的demo例子,一般是在`vendor/${partener_gms}/apps`目录下.<br>
+而raw这个目录则包含了Google SetupWizard的流程, Google SetupWizard就会按照这些xml的流程跳转到对应的界面, 包括自定义的界面.所以这个raw目录是自定义Google SetupWizard的核心, 无论是添加还是修改页面,都很可能会涉及到<br>
+移植了这个raw目录之后需要修改包名`com.google.android.gmsintegration`为自己的包名
 1. 进入res/raw目录
-2. 执行`sed -i "s/com.google.android.gmsintegration/com.setupwizard.demo/g" `grep com.google.android.gmsintegration -rl .``
+2. 执行*sed -i "s/com.google.android.gmsintegration/com.setupwizard.demo/g" \`grep com.google.android.gmsintegration -rl .\`*
 3. 执行`ag com.setupwizard.demo`看是否与AndroidManifest.xml中的包名是否保持一致即可
 
 # 添加启动时的uri
@@ -80,5 +80,12 @@ public class SuwCustomizationReceiver extends BroadcastReceiver {
     <string name="wizard_script_uri" translatable="false">android.resource://com.setupwizard.demo/raw/wizard_script</string>
 </resources>
 ```
+# 简单的自定义
+为了区分与原生Google SetupWizard的不同, 在`strings.xml`添加一行字符串用于overlay原生的字符串, 在Google文档中还规定了许多可以定制的资源,详情见文档中的*Providing resource assets*
+```xml
+<!--strings.xml-->
+<!--sim_missing_text出现在设置向导第二页, 前提是设备没有插入sim卡-->
+<string name="sim_missing_text">Demo for sim missing</string>
+```
 # 总结
-以上步骤之后就可以编译自定义的SetupWizard然后push进去启动了, 这样得到的仍然是原生Android的页面,如何自定义SetupWizard留待后续文章, **拷贝代码的时候要注意修改包名**
+以上步骤之后就可以编译自定义的SetupWizard然后push进去启动了, 不插卡的情况下在第二页中就可以看到效果了, **拷贝代码的时候要注意修改包名**
