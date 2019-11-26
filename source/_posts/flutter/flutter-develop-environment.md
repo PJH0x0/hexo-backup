@@ -5,6 +5,7 @@ categories:
   - flutter
 tags:
   - flutter
+abbrlink: 16df9b82
 ---
 >本文介绍的是在没有下载AndroidStudio的情况下如何搭建flutter开发环境, 系统基于Ubuntu 18.04, Windows应该也是差不多, 主要是我想要用vim开发flutter, 习惯了vim
 
