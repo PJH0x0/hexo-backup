@@ -1,0 +1,43 @@
+@startuml packageinstaller-install-package-sequence
+participant InstallInstalling as c1
+participant PackageInstaller as c2
+participant PackageInstallerService as c3
+c1->c1 : onCreate()
+c1->c2 : createSession()
+c2->c3 : createSession()
+c3-->c2 : sessionId
+c2-->c1 : sessionId
+c1->c1 : onResume()
+participant InstallingAsyncTask as c4
+c1->c4 : execute()
+c4->c4 : doInBackground()
+c4->c2 : openSession(sessionId)
+c2-->c4 : Session
+participant PackageInstallerSession as c5
+c4->c5 : openWrite()
+c4->c4 : doPostExecute()
+c4->c5 : commit()
+c5->Handler : sendToTarget(MSG_COMMIT)
+participant mHandlerCallback as c6
+Handler->c6 : handleMessage(MSG_COMMIT)
+c6->c5 : handleCommit()
+c5->c5 : commitNonStagedLocked()
+participant PkMS as c7
+c5->c7 : installStage()
+participant PkMS.PackageHandler as c8
+c7->c8 : sendMessage(INIT_COPY)
+participant PkMS.HandlerParams as c9
+c8->c9 : startCopy()
+participant PkMS.InstallParams as c10
+c9->c10 : handleStartCopy()
+c9->c10 : handleReturnCode()
+c10->c7 : processPendingInstall()
+c7->c7 : processInstallRequestsAsync()
+c7->c7 : installPackagesTracedLI()
+c7->c7 : installPackagesLI()
+c7->c7 : preparePackageLI()
+c7->c7 : scanPackageTracedLI()
+c7->c7 : commitPackagesLocked()
+c7->c7 : commitReconciledScanResultLocked()
+c7->c7 : commitPackageSettings()
+@enduml

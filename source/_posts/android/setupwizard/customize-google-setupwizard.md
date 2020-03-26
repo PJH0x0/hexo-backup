@@ -20,7 +20,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES := \
 #Android P library
 include frameworks/opt/setupwizard/library/common-gingerbread.mk
 ```
-Android.mk中需要添加SetupWizard库,这个是为了使用Google SetupWizard的主题而添加的,如果使用自定义的主题的话,有可能测不过GMS.另外就是新增页面的根布局**必须**要使用库中的GlifLayout或者是PartenerCustomizationLayout
+Android.mk中需要添加SetupWizard库,这个是为了使用Google SetupWizard的主题而添加的,如果使用自定义的主题的话,有可能测不过GMS. Android P使用的是frameworks/opt/setupwizard, 而Android Q必须换成external下的setupcompat和setupdesign.另外就是新增页面的根布局**必须**要使用库中的GlifLayout(Android P)或者是PartenerCustomizationLayout(Android Q)
 # 添加BroadcastReceiver
 按照Google的文档,我们需要添加一个空的广播用于接收`com.android.setupwizard.action.PARTNER_CUSTOMIZATION`,这个广播可以不做任何动作
 

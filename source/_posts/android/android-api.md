@@ -76,7 +76,7 @@ getLocationOnScreen(location);
 ### 第三方APK跳转
 **Tips:**这种方法不能设置`android:exported="false"`属性
 ```java
-//包名和类名不一定相同，以AndroidManifest.xml里面的packgeName以及Activity标签中的类名为准
+//包名和类名不一定相同，以AndroidManifest.xml里面的packageName以及Activity标签中的类名为准
 ComponentName componentName = new ComponentName("com.android.settings","com.android.settings.wifi.WifiSetupActivity");
 Intent intent = new Intent(Intent.ACTION_MAIN);
 intent.addCategory(Intent.CATEGORY_DEFAULT);
