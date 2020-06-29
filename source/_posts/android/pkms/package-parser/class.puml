@@ -1,0 +1,123 @@
+@startuml
+
+class PackageLite {
+    +final String packageName;
+    +final int versionCode;
+    +final int versionCodeMajor;
+    +final int installLocation;
+    +final VerifierInfo[] verifiers;
+    +final String[] splitNames;
+    +final boolean[] isFeatureSplits;
+    +final String[] usesSplitNames;
+    +final String[] configForSplit;
+    +final String codePath;
+    +final String baseCodePath;
+    +final String[] splitCodePaths;
+    +final int baseRevisionCode;
+    +final int[] splitRevisionCodes;
+    +final boolean coreApp;
+    +final boolean debuggable;
+    +final boolean multiArch;
+    +final boolean use32bitAbi;
+    +final boolean extractNativeLibs;
+    +final boolean isolatedSplits;    
+}
+class ApkLite {
+    +final String codePath;
+    +final String packageName;
+    +final String splitName;
+    +boolean isFeatureSplit;
+    +final String configForSplit;
+    +final String usesSplitName;
+    +final int versionCode;
+    +final int versionCodeMajor;
+    +final int revisionCode;
+    +final int installLocation;
+    +final int minSdkVersion;
+    +final int targetSdkVersion;
+    +final VerifierInfo[] verifiers;
+    +final SigningDetails signingDetails;
+    +final boolean coreApp;
+    +final boolean debuggable;
+    +final boolean multiArch;
+    +final boolean use32bitAbi;
+    +final boolean extractNativeLibs;
+    +final boolean isolatedSplits;
+    +final boolean isSplitRequired;
+    +final boolean useEmbeddedDex;
+    
+}
+class Package {
+    +String packageName
+    +String manifestPackageName
+    +String[] splitNames
+    +String volumeUuid
+    +String codePath
+    +String baseCodePath
+    +String[] splitCodePaths
+    +int baseRevisionCode;
+    +int[] splitRevisionCodes
+    +int[] splitFlags
+    +int[] splitPrivateFlags
+    +boolean baseHardwareAccelerated
+    +ApplicationInfo applicationInfo
+    +ArrayList<Permission> permissions
+    +ArrayList<PermissionGroup> permissionGroups
+    +ArrayList<Activity> activities
+    +ArrayList<Activity> receivers
+    +ArrayList<Provider> providers
+    +ArrayList<Service> services
+    +ArrayList<Instrumentation> instrumentation
+    +ArrayList<String> requestedPermissions
+    +ArrayList<String> implicitPermissions
+    +ArrayList<String> protectedBroadcasts
+    +Package parentPackage
+    +ArrayList<Package> childPackages
+    +String staticSharedLibName
+    +long staticSharedLibVersion
+    +ArrayList<String> libraryNames
+    +ArrayList<String> usesLibraries
+    +ArrayList<String> usesStaticLibraries
+    +long[] usesStaticLibrariesVersions
+    +String[][] usesStaticLibrariesCertDigests
+    +ArrayList<String> usesOptionalLibraries
+    +String[] usesLibraryFiles
+    +ArrayList<SharedLibraryInfo> usesLibraryInfos
+    +ArrayList<ActivityIntentInfo> preferredActivityFilters
+    +ArrayList<String> mOriginalPackages
+    +String mRealPackage
+    +ArrayList<String> mAdoptPermissions
+    +Bundle mAppMetaData
+    +int mVersionCode
+    +int mVersionCodeMajor
+    +String mVersionName
+    +String mSharedUserId
+    +int mSharedUserLabel
+    +SigningDetails mSigningDetails
+    +int mPreferredOrder
+    +long[] mLastPackageUsageTimeInMills
+    +Object mExtras
+    +ArrayList<ConfigurationInfo> configPreferences
+    +ArrayList<FeatureInfo> reqFeatures
+    +ArrayList<FeatureGroupInfo> featureGroups
+    +int installLocation
+    +boolean coreApp
+    +boolean mRequiredForAllUsers
+    +String mRestrictedAccountType
+    +String mRequiredAccountType
+    +String mOverlayTarget
+    +String mOverlayTargetName
+    +String mOverlayCategory
+    +int mOverlayPriority
+    +boolean mOverlayIsStatic
+    +int mCompileSdkVersion
+    +String mCompileSdkVersionCodename
+    +ArraySet<String> mUpgradeKeySets
+    +ArrayMap<String, ArraySet<PublicKey>> mKeySetMapping
+    +String cpuAbiOverride
+    +boolean use32bitAbi
+    +byte[] restrictUpdateHash
+    +boolean visibleToInstantApps
+    +boolean isStub
+}
+@enduml

@@ -1,0 +1,39 @@
+@startuml packageinstall-1
+class PackageInstaller.SessionParams {
+    public static final int MODE_INVALID = -1;
+    public static final int MODE_FULL_INSTALL = 1;
+    public static final int MODE_INHERIT_EXISTING = 2;
+    public static final @NonNull Set<String> RESTRICTED_PERMISSIONS_ALL = new ArraySet<>();
+    public static final int UID_UNKNOWN = -1;
+    public int mode = MODE_INVALID;
+    public int installFlags = PackageManager.INSTALL_ALL_WHITELIST_RESTRICTED_PERMISSIONS;
+    public int installLocation = PackageInfo.INSTALL_LOCATION_INTERNAL_ONLY;
+    public @InstallReason int installReason = PackageManager.INSTALL_REASON_UNKNOWN;
+    public long sizeBytes = -1;
+    public String appPackageName;
+    public Bitmap appIcon;
+    public String appLabel;
+    public long appIconLastModified = -1;
+    public Uri originatingUri;
+    public int originatingUid = UID_UNKNOWN;
+    public Uri referrerUri;
+    public String abiOverride;
+    public String volumeUuid;
+    public String[] grantedRuntimePermissions;
+    public List<String> whitelistedRestrictedPermissions;
+    public String installerPackageName;
+    public boolean isMultiPackage;
+    public boolean isStaged;
+    public long requiredInstalledVersionCode = PackageManager.VERSION_CODE_HIGHEST;
+}
+class PackageManagerService.ActiveInstallSession {
+    private final String mPackageName;
+    private final File mStagedDir;
+    private final IPackageInstallObserver2 mObserver;
+    private final PackageInstaller.SessionParams mSessionParams;
+    private final String mInstallerPackageName;
+    private final int mInstallerUid;
+    private final UserHandle mUser;
+    private final SigningDetails mSigningDetails;
+}
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+participant UsbManager as c1
+participant UsbService as c2
+c1->c2 : setCurrentFunctions()
+participant UsbDeviceManager as c3
+c2->c3 : setCurrentFunctions()
+participant UsbHandler as c4
+c3->c4 : sendMessage(MSG_SET_CURRENT_FUNCTIONS)
+participant UsbHandlerLegacy as c5
+c4->c5 : setEnabledFunctions()
+c5->c5 : trySetEnabledFunctions()
+c5->c5 : setUsbConfig()
+
+@enduml

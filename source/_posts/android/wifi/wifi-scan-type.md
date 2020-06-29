@@ -10,7 +10,7 @@ tags:
 abbrlink: f0e0a512
 ---
 # Android O Wifi扫描场景
-抄自[Android wifi扫描机制(Android O)](https://blog.csdn.net/h784707460/article/details/79658950), 有想研究的可以直接看原文, 就是排版有点不好
+转载自[Android wifi扫描机制(Android O)](https://blog.csdn.net/h784707460/article/details/79658950), 有想研究的可以直接看原文, 就是排版有点不好
 1. 亮屏情况下，在Wifi settings界面，固定扫描，时间间隔为10s。
 2. 亮屏情况下，非Wifi settings界面，二进制指数退避扫描，退避算法：interval*(2^n), 最小间隔min=20s, 最大间隔max=160s.
 3. 灭屏情况下，有保存网络时，若已连接，不扫描，否则，PNO扫描，即只扫描已保存的网络。最小间隔min=20s，最大间隔max=60s. 

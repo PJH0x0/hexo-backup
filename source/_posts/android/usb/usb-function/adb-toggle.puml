@@ -1,0 +1,33 @@
+@startuml
+participant DevelopmentDashboardFragment as c1
+participant AdbSettingsObserver as c2
+participant AdbHandler as c3
+participant AdbService as c4
+actor User
+User->c1 : toggle adb
+c1->c2 : onChange()
+note right : AdbSettingsObserver listen Settings.Global.ADB_ENABLED change
+c2->c3 : sendMessage(MSG_ENABLE_ADB)
+c3->c4 : setAdbEnabled()
+== System properties set ==
+participant UsbHandler.AdbTransport as c5
+c4->c5 : onAdbEnabled()
+participant UsbHandler as c6
+c5->c6 : sendMessage(MSG_ENABLE_ADB)
+c6->c6 : setAdbEnabled()
+participant UsbHandlerLegacy as c7
+c6->c7 : setEnabledFunctions()
+== Adb debug start ==
+participant AdbDebuggingManager as c8
+c4->c8 : setAdbEnabled()
+participant AdbDebuggingHandler as c9
+participant AdbDebuggingThread as c10
+alt Enable adb
+    c8->c9 : sendMessage(MESSAGE_ADB_ENABLED)
+    c9->c10 : start thread
+    c10->c10 : openSocketLocked()
+    c10->c10 : listenToSocket()
+else Disable adb
+    C8->C9 : sendMessage(MESSAGE_ADB_DISABLED)
+    c9->c10 : stopListening()
+@enduml

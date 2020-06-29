@@ -1,0 +1,41 @@
+@startuml
+participant PackageManagerService as c0
+participant PackageParser as c1
+c0->c1 : parsePackage()
+activate c1
+c1->c1 : getCachedResult()
+alt get cach success
+    c1->c0 : PackageParser.Package
+else 
+    c1->c1 : parseClusterPackage()
+    activate c1
+end
+c1->c1 : parseClusterPackageLite()
+activate c1
+c1->c1 : parseApkLite() 2 params
+activate c1
+c1->c1 : parseApkLiteInner()
+c1->c1 : parseApkLite() 4 params and static
+c1->c1 : return the ApkLite
+deactivate c1
+c1->c1 : return PackageLite
+deactivate c1
+
+c1->c1 : parseBaseApk() 3 params
+activate c1
+c1->c1 : parseBaseApk() 5 params
+c1->c1 : parseBaseApkCommon()
+c1->c1 : return Package
+deactivate c1
+c1->c1 : parseSplitApk() 4 params
+activate c1
+c1->c1 : parseSplitApk() 6 params
+c1->c1 : parseSplitApplication()
+c1->c1 : return Package
+deactivate c1
+deactivate c1
+c1->c1 : cacheResult()
+c1->c0 : return Package
+deactivate c1
+
+@enduml

@@ -29,11 +29,16 @@ scanDirLI() -> ParallelPackageParser.submit() -> PackageParser.parsePackage() ->
 从collectCertificates方法开始,解析出SigningDetails数据结构结束, 详情可参考[APK签名机制原理详解](https://www.jianshu.com/p/286d2b372334)
 
 # APK install简单流程
-PackageInstaller->InstallInstalling.java
-onCreate()(构建SessionParams, 并调用createSession()) -> onResume()(触发线程) -> doInBackground()(调用openWrite进行拷贝文件) -> doPostExcute()(调用session.commit()方法)
+详情见uml图
 
-PackageInstallerSession.java
-openWrite() : 将文件拷贝至/data/app/vmd-uid.tmp目录下
-commit() -> mHandlerCallback.handleMessage() -> handleCommit -> commitNonStagedLocked() -> 
-
+# packages.list结构图
+一行中的结构如下所示，以空格隔开
+1. pkgName    - package name
+2. userId     - application-specific user id
+3. debugFlag  - 0 or 1 if the package is debuggable.
+4. dataPath   - path to package's data path
+5. seinfo     - seinfo label for the app (assigned at install time)
+6. gids       - supplementary gids this app launches with
+7. profileableFromShellFlag  - 0 or 1 if the package is profileable from shell.
+8. longVersionCode - integer version of the package.
 
