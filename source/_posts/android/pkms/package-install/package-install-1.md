@@ -1,5 +1,5 @@
 ---
-title:Android Q PackageInstaller安装Package流程(一)
+title:Android Q PackageInstaller安装Package流程
 date:2020/06/10
 category:
   - android
@@ -630,12 +630,14 @@ Android Q用的是GooglePackageInstaller,看类和接口方面和Android Package
 
 # 总结
 
-由于package install的过程比较长，分为1,2两部分进行分析，第一部分的流程总结大致如下：
+通过`PackageInstaller`安装应用流程总结如下：
 1. 由`InstallInstalling`发起与`PackageInstaller`的通信请求，初始化`SessionParams`
 2. 创建`Session`并初始化临时文件夹stageDir, stageDir的目录是`vmdl+sessionId.tmp`
 3. `openSession`的目的就是创建stageDir
 4. 将apk拷入到stageDir中
 5. 进行commit并设置好回调，使用的是`PendingIntent`的`BroadcastReceiver`
+
+后续进入`PackageManagerService`中的流程详见Android Q 应用安装流程系列
 
 # 遗留的问题
 1. 为什么要使用Session
