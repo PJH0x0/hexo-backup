@@ -6,9 +6,11 @@ category:
   - framework
 ---
 
-Android Q用的是GooglePackageInstaller,看类和接口方面和Android PackageInstaller应当是类似的代码和流程
+Android Q用的是GooglePackageInstaller,看类和接口方面和AOSP中PackageInstaller应当是类似的代码和流程
 
 # 类图
+
+![packageinstaller-install-package-class](packageinstaller-install-package-class.png)
 
 # InstallInstalling.onCreate()
 ```java

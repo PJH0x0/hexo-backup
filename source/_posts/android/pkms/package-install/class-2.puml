@@ -1,0 +1,83 @@
+@startuml package-install-class-1
+abstract class PackageManagerService.HandlerParams {
+    private final UserHandle mUser;
+    String traceMethod;
+    int traceCookie;
+
+    {abstract} void handleStartCopy();
+    {abstract} void handleReturnCode();
+}
+
+
+class PackageManagerService.InstallParams {
+    final OriginInfo origin;
+    final MoveInfo move;
+    final IPackageInstallObserver2 observer;
+    int installFlags;
+    final String installerPackageName;
+    final String volumeUuid;
+    private boolean mVerificationCompleted;
+    private boolean mEnableRollbackCompleted;
+    private InstallArgs mArgs;
+    int mRet;
+    final String packageAbiOverride;
+    final String[] grantedRuntimePermissions;
+    final List<String> whitelistedRestrictedPermissions;
+    final VerificationInfo verificationInfo;
+    final PackageParser.SigningDetails signingDetails;
+    final int installReason;
+    MultiPackageInstallParams mParentInstallParams;
+    final long requiredInstalledVersionCode;
+    
+}
+PackageManagerService.HandlerParams <|-- PackageManagerService.InstallParams
+
+class PackageManagerService.InstallRequest {
+    public final InstallArgs args;
+    public final PackageInstalledInfo installResult;
+}
+class PackageManagerService.PackageInstalledInfo {
+    String name;
+    int uid;
+    int[] origUsers;
+    int[] newUsers;
+    PackageParser.Package pkg;
+    int returnCode;
+    String returnMsg;
+    String installerPackageName;
+    PackageRemovedInfo removedInfo;
+    ArrayMap<String, PackageInstalledInfo> addedChildPackages;
+    ArrayList<PackageParser.Package> libraryConsumers;
+    String origPackage;
+    String origPermission;
+}
+
+abstract class PackageManagerService.InstallArgs {
+    final OriginInfo origin;
+    final MoveInfo move;
+
+    final IPackageInstallObserver2 observer;
+    final int installFlags;
+    final String installerPackageName;
+    final String volumeUuid;
+    final UserHandle user;
+    final String abiOverride;
+    final String[] installGrantPermissions;
+    final List<String> whitelistedRestrictedPermissions;
+    final String traceMethod;
+    final int traceCookie;
+    final PackageParser.SigningDetails signingDetails;
+    final int installReason;
+    @Nullable final MultiPackageInstallParams mMultiPackageInstallParams;
+}
+
+class PackageManagerService.FileInstallArgs {
+    private File codeFile;
+    private File resourceFile;    
+}
+
+PackageManagerService.InstallArgs <|-- PackageManagerService.FileInstallArgs
+
+PackageManagerService.InstallRequest o-- PackageManagerService.PackageInstalledInfo
+PackageManagerService.InstallRequest o-- PackageManagerService.InstallArgs 
+@enduml

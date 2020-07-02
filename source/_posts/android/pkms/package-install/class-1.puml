@@ -1,4 +1,4 @@
-@startuml packageinstall-1
+@startuml packageinstaller-install-package-class
 class PackageInstaller.SessionParams {
     public static final int MODE_INVALID = -1;
     public static final int MODE_FULL_INSTALL = 1;
