@@ -9,6 +9,10 @@ category:
 对于`PackageInstallerSession`传递的Session进行处理，最终生成`FileInstallArgs`和`PackageInstalledInfo`, 又由这两个参数生成`InstallRequest`，
 最后调用`installPackagesTracedLI()`方法进行最终的安装工作
 
+# 涉及的类图
+
+![package-install-class](package-install-class-1.png)
+
 # PackageManagerService.installStage()
 
 ```java

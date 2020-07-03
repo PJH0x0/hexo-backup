@@ -1,0 +1,21 @@
+@startuml package-install-class-2
+
+class PrepareResult {
+    public final int installReason
+    public final String volumeUuid
+    public final String installerPackageName
+    public final UserHandle user
+    public final boolean replace
+    public final int scanFlags
+    public final int parseFlags
+    public final PackageParser.Package existingPackage
+    public final PackageParser.Package packageToScan
+    public final boolean clearCodeCache
+    public final boolean system
+    public final String renamedPackage
+    public final PackageFreezer freezer
+    public final PackageSetting originalPs
+    public final PackageSetting disabledPs
+    public final PackageSetting[] childPackageSettings   
+}
+@enduml
