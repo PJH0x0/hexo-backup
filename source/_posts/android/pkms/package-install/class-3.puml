@@ -1,6 +1,6 @@
 @startuml package-install-class-2
 
-class PrepareResult {
+class PackageManagerService.PrepareResult {
     public final int installReason
     public final String volumeUuid
     public final String installerPackageName
@@ -18,4 +18,31 @@ class PrepareResult {
     public final PackageSetting disabledPs
     public final PackageSetting[] childPackageSettings   
 }
+
+class PackageManagerService.ScanRequest {
+    @NonNull public final PackageParser.Package pkg;
+    @Nullable public final PackageParser.Package oldPkg;
+    @Nullable public final SharedUserSetting sharedUserSetting;
+    @Nullable public final PackageSetting pkgSetting;
+    @Nullable public final PackageSetting oldPkgSetting;
+    @Nullable public final PackageSetting disabledPkgSetting;
+    @Nullable public final PackageSetting originalPkgSetting;
+    @Nullable public final String realPkgName;
+    public final @ParseFlags int parseFlags;
+    public final @ScanFlags int scanFlags;
+    @Nullable public final UserHandle user;
+    public final boolean isPlatformPackage;
+    
+}
+
+class PackageManagerService.ScanResult {
+    public final ScanRequest request;
+    public final boolean success;
+    public final boolean existingSettingCopied;
+    @Nullable public final PackageSetting pkgSetting;
+    @Nullable public final List<String> changedAbiCodePath;
+    public final SharedLibraryInfo staticSharedLibraryInfo;
+    public final List<SharedLibraryInfo> dynamicSharedLibraryInfos;
+}
+PackageManagerService.ScanResult --> PackageManagerService.ScanRequest
 @enduml

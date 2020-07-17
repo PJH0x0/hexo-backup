@@ -161,8 +161,11 @@ category:
 **一致性**：在各自的上下文中验证扫描后的pacakges和当前的系统状态来保证install成功
 4. **Commit**: Commits all scanned packages and updates system state. This is the only place that system state may be modified in the install flow and all predictable errors must be determined before this phase.
 **提交**:提交所有的已扫描的packages并且更新系统状态， 这步只是在安装流程中将系统状态修改并且所有可预知的错误必须在这个阶段之前就决定
-下面根据这4个步骤一步步分析即可, 这里有个地方注意`if (null != preparedScans.put(result.pkgSetting.pkg.packageName, result))` 如果`preparedScan`中已经有该`package`的
+下面根据这4个步骤一步步分析即可, 
+有几个点需要注意一下：
+1. 这里有个地方注意`if (null != preparedScans.put(result.pkgSetting.pkg.packageName, result))` 如果`preparedScan`中已经有该`package`的
 `ScanResult`则返回null,如果已经有了就会返回`ScanResult`
+2. `staticSharedLibraryInfo`对应AndroidManifest中的`static-library`标签，看起来基本没用
 
 
 
